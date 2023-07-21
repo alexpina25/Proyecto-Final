@@ -10,11 +10,11 @@ const NegocioSchema = new mongoose.Schema(
       ciudad: { type: String, required: true },
       provincia: { type: String, required: true },
       codigoPostal: { type: String, required: true },
-      lat: { type: Number, required: true },
-      lng: { type: Number, required: true },
+      lat: { type: Number },
+      lng: { type: Number },
     },
     telefono: { type: String, required: true },
-    email: {
+    email_negocio: {
       type: String,
       required: true,
       unique: true,
@@ -39,14 +39,14 @@ const NegocioSchema = new mongoose.Schema(
     reservas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reserva" }],
     imagenes: [{ type: String }],
     confirmationCode: { type: Number, required: true },
-    check: { type: Boolean, default: false },
+    check: { type: Boolean, default: true }, //! TRUE PARA PRUEBAS
   },
   { timestamps: true }
 );
 
-NegocioSchema.pre("save", async function (next) {
+NegocioSchema.pre("save", function (next) {
   try {
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = bcrypt.hashSync(this.password, 10);
     next();
   } catch (error) {
     next("Error hashing password", error);
