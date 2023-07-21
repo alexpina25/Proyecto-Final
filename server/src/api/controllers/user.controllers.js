@@ -1,5 +1,4 @@
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
-const setError = require("../../helpers/handle-error");
 const randomCode = require("../../utils/randomCode");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
@@ -13,77 +12,88 @@ const PORT = process.env.PORT;
 const BASE_URL = process.env.BASE_URL;
 const BASE_URL_COMPLETE = `${BASE_URL}${PORT}`;
 
+const EMAIL_USERNAME = process.env.EMAIL_USERNAME;
+const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const EMAIL_SERVICE = process.env.EMAIL_SERVICE;
+
+const DEFAULT_IMAGE_URL = "https://pic.onlinewebfonts.com/svg/img_181369.png";
+
 //! -----------------------------------------------------------------------------
-//? ----------------------------REGISTER----------------------------
+//? ----------------------------REGISTER-----------------------------------------
 //! -----------------------------------------------------------------------------
 const register = async (req, res, next) => {
-  let catchImg = req.file?.path;
   try {
-    await User.syncIndexes();
-    let confirmationCode = randomCode();
-    const userExist = await User.findOne(
-      { email: req.body.email },
-      { name: req.body.name }
-    );
-    if (!userExist) {
-      const newUser = new User({ ...req.body, confirmationCode });
+    const { email } = req.body;
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
       if (req.file) {
-        newUser.image = req.file.path;
-      } else {
-        newUser.image = "https://pic.onlinewebfonts.com/svg/img_181369.png";
+        deleteImgCloudinary(req.file.path);
       }
+      return res.status(409).json("Este usuario ya existe");
+    }
 
-      try {
-        const userSave = await newUser.save();
+    const confirmationCode = randomCode();
+    const user = new User({ ...req.body, confirmationCode });
 
-        if (userSave) {
-          return res.redirect(
-            `${BASE_URL_COMPLETE}/api/v1/users/register/sendMail/${userSave._id}`
-          );
-        }
-      } catch (error) {
-        return res.status(404).json(error.message);
-      }
+    if (req.file) {
+      user.image = req.file.path;
     } else {
-      if (req.file) deleteImgCloudinary(catchImg);
-      return res.status(409).json("this user already exist");
+      user.image = DEFAULT_IMAGE_URL;
+    }
+
+    try {
+      const savedUser = await user.save();
+      if (savedUser) {
+        return res.redirect(
+          `${BASE_URL_COMPLETE}/api/v1/users/register/sendCode/${savedUser._id}`
+        );
+      }
+    } catch (error) {
+      if (req.file) {
+        deleteImgCloudinary(req.file.path);
+      }
+      return res.status(404).json(error.message);
     }
   } catch (error) {
-    if (req.file) {
-      deleteImgCloudinary(catchImg);
-    }
     return next(error);
   }
 };
 
 //! -----------------------------------------------------------------------------
-//? ------------------CONTRALADORES QUE PUEDEN SER REDIRECT --------------------
-//! ----------------------------------------------------------------------------
+//? ------------------CONTRALADORES QUE PUEDEN SER REDIRECT ---------------------
+//! -----------------------------------------------------------------------------
 
 //!!! esto quiere decir que o bien tienen entidad propia porque se llaman por si mismos por parte del cliente
 //! o bien son llamados por redirect es decir son controladores de funciones accesorias
 
+//! -----------------------------------------------------------------------------
+//? ----------------------------- SEND CODE -------------------------------------
+//! -----------------------------------------------------------------------------
 const sendCode = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userDB = await User.findById(id);
 
-    const emailEnv = process.env.EMAIL;
-    const password = process.env.PASSWORD;
-
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: EMAIL_SERVICE,
       auth: {
-        user: emailEnv,
-        pass: password,
+        user: EMAIL_USERNAME,
+        pass: EMAIL_PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: emailEnv,
+      from: EMAIL_USERNAME,
       to: userDB.email,
-      subject: "Confirmation code",
-      text: `tu codigo es ${userDB.confirmationCode}, gracias por confiar en nosotros ${userDB.name}`,
+      subject: "Código de confirmación",
+      html: `
+    <h2>Bienvenido(a), ${userDB.name}!</h2>
+    <p>Gracias por registrarte en Reserval.</p>
+    <p>Tu código de confirmación es: <strong>${userDB.confirmationCode}</strong></p>
+    <p>Por favor, utiliza este código para confirmar tu cuenta.</p>
+    <p>¡Esperamos que disfrutes de nuestros servicios!</p>
+  `,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -91,7 +101,7 @@ const sendCode = async (req, res, next) => {
         console.log(error);
         return res.status(404).json({
           user: userDB,
-          confirmationCode: "error, resend code",
+          confirmationCode: "Error al enviar el código, vuelve a enviarlo",
         });
       } else {
         console.log("Email sent: " + info.response);
@@ -109,107 +119,121 @@ const sendCode = async (req, res, next) => {
 //! -----------------------------------------------------------------------------
 //? --------------------------------LOGIN ---------------------------------------
 //! -----------------------------------------------------------------------------
-
-const login = async (req, res, next) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const userDB = await User.findOne({ email });
-
     if (userDB) {
-      if (userDB.check && bcrypt.compareSync(password, userDB.password)) {
-        const token = generateToken(userDB._id, email);
-        return res.status(200).json({
-          user: userDB,
-          token,
-        });
-      } else if (!userDB.check) {
-        return res.status(401).json("User has not validated the email");
+      if (userDB.check) {
+        const passwordMatch = bcrypt.compareSync(password, userDB.password);
+
+        if (passwordMatch) {
+          const token = generateToken(userDB._id, email);
+          return res.status(200).json({
+            user: userDB,
+            token,
+          });
+        } else {
+          return res.status(401).json("La contraseña es incorrecta");
+        }
       } else {
-        return res.status(401).json("Invalid password");
+        return res
+          .status(401)
+          .json("El correo electrónico no ha sido validado");
       }
     } else {
-      return res.status(404).json("User not registered");
+      return res.status(401).json("Usuario no registrado");
     }
   } catch (error) {
-    return next(error);
+    return res.status(500).json("Error al procesar la solicitud");
   }
 };
 
 //! -----------------------------------------------------------------------------
 //? -----------------------RESEND CODE -----------------------------
 //! -----------------------------------------------------------------------------
-const resendCode = async (req, res, next) => {
+const resendCode = async (req, res) => {
   try {
-    //! vamos a configurar nodemailer porque tenemos que enviar un codigo
-    const email = process.env.EMAIL;
-    const password = process.env.PASSWORD;
+    const { email } = req.body;
+    const userDB = await User.findOne({ email });
+
+    if (userDB.check) {
+      return res.status(400).json("El usuario ya está verificado.");
+    }
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: EMAIL_SERVICE,
       auth: {
-        user: email,
-        pass: password,
+        user: EMAIL_USERNAME,
+        pass: EMAIL_PASSWORD,
       },
     });
-    //! hay que ver que el usuario exista porque si no existe no tiene sentido hacer ninguna verificacion
+
     const userExists = await User.findOne({ email: req.body.email });
 
     if (userExists) {
+      const newConfirmationCode = randomCode(); // Generar nuevo código de confirmación
+
       const mailOptions = {
-        from: email,
-        to: req.body.email,
-        subject: "Confirmation code",
-        text: `tu codigo es ${userExists.confirmationCode}`,
+        from: EMAIL_USERNAME,
+        to: userExists.email,
+        subject: "Reenvío de código de confirmación",
+        html: `
+          <h2>Reenvío de código de confirmación</h2>
+          <p>Tu nuevo código de confirmación es: <strong>${newConfirmationCode}</strong></p>
+          <p>Por favor, utiliza este código para confirmar tu cuenta.</p>
+        `,
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.log(error);
+          return res.status(500).json("Error al enviar el correo electrónico");
         } else {
           console.log("Email sent: " + info.response);
-          return res.status(200).json({
-            resend: true,
-          });
+          // Actualizar el código de confirmación en el usuario
+          userExists.confirmationCode = newConfirmationCode;
+          userExists.save();
+          return res
+            .status(200)
+            .json("El código de verificación ha sido reenviado correctamente");
         }
       });
     } else {
-      return res.status(404).json("User not found");
+      return res.status(404).json("Usuario no encontrado");
     }
   } catch (error) {
-    return next(setError(500, error.message || "Error general send code"));
+    return res.status(500).json("Error al procesar la solicitud");
   }
 };
 
 //! ------------------------------------------------------------------------
-//? -------------------------- CHECK NEW USER------------------------------
+//? -------------------------- CHECKCODE------------------------------
 //! ------------------------------------------------------------------------
 
-const checkNewUser = async (req, res, next) => {
+const checkCode = async (req, res) => {
   try {
-    const { email, confirmationCode } = req.body;
+    const { id } = req.params;
+    const { confirmationCode } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (!userExists) {
-      return res.status(404).json("User not found");
-    } else {
-      if (confirmationCode === userExists.confirmationCode) {
-        try {
-          await User.findByIdAndUpdate(userExists._id, { check: true });
-        } catch (error) {
-          return res.status(404).json(error.message);
-        }
+    const user = await User.findById(id);
 
-        const updateUser = await User.findOne({ email });
-
-        return res.status(200).json({
-          testCheckOk: updateUser.check === true ? true : false,
-        });
-      } else {
-        // Código incorrecto
-        return res.status(400).json("Incorrect code");
-      }
+    if (!user) {
+      return res.status(404).json("Usuario no encontrado");
     }
+
+    if (confirmationCode === user.confirmationCode) {
+      user.check = true;
+      await user.save();
+
+      return res.status(200).json({
+        message:
+          "Código de confirmación correcto. El usuario ha sido verificado.",
+      });
+    }
+
+    return res.status(400).json("Código incorrecto");
   } catch (error) {
-    return next(setError(500, "General error check code"));
+    return res.status(500).json("Error general al verificar el código");
   }
 };
 
@@ -220,71 +244,66 @@ const checkNewUser = async (req, res, next) => {
 //? -----------------------------------------------------------------------------
 //! ------------------CAMBIO DE CONTRASEÑA CUANDO NO ESTAS LOGADO---------------
 //? -----------------------------------------------------------------------------
-
 const changePassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-
     const userDb = await User.findOne(email);
-    console.log(userDb);
-    if (userDb) {
-      return res.redirect(
-        `${BASE_URL_COMPLETE}/api/v1/users/sendPassword/${userDb._id}`
-      );
-    } else {
-      return res.status(404).json("User no register");
-    }
-  } catch (error) {
-    return next(error);
-  }
-};
 
-const sendPassword = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const userDb = await User.findById(id);
-    const email = process.env.EMAIL;
-    const password = process.env.PASSWORD;
+    if (!userDb) {
+      return res.status(404).json("Usuario no registrado");
+    }
+
+    if (!userDb.check) {
+      return res
+        .status(401)
+        .json("El usuario no ha validado el correo electrónico");
+    }
+
+    const newPassword = randomPassword();
+    const newPasswordBcrypt = bcrypt.hashSync(newPassword, 10);
+
+    // Actualizar la contraseña del usuario en la base de datos
+    userDb.password = newPasswordBcrypt;
+    await userDb.save();
+
+    // Enviar la nueva contraseña por correo
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: EMAIL_SERVICE,
       auth: {
-        user: email,
-        pass: password,
+        user: EMAIL_USERNAME,
+        pass: EMAIL_PASSWORD,
       },
     });
-    let passwordSecure = randomPassword();
-    console.log(passwordSecure);
+
     const mailOptions = {
-      from: email,
+      from: EMAIL_USERNAME,
       to: userDb.email,
-      subject: "-----",
-      html: `User: ${userDb.name}. Your new code login is <b>${passwordSecure}</b> Hemos enviado esto porque tenemos una solicitud de cambio de contraseña, si no has sido ponte en contacto con nosotros, gracias.`,
+      subject: "Cambio de contraseña",
+      html: `
+        <p>Hola ${userDb.name},</p>
+        <p>Tu contraseña ha sido cambiada correctamente.</p>
+        <p>Tu nueva contraseña es: <strong>${newPassword}</strong></p>
+        <p>Por favor, por tu seguridad actualiza esta contraseña.</p>
+        <p>Si no has solicitado el cambio de contraseña, por favor ponte en contacto con nosotros.</p>
+        <p>Atentamente,</p>
+        <p>Tu equipo de Reserval</p>
+      `,
     };
-    transporter.sendMail(mailOptions, async function (error, info) {
+
+    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error);
-        return res.status(404).json("dont send email and dont update user");
+        return res
+          .status(500)
+          .json(
+            "No se pudo enviar el correo electrónico y no se actualizó la contraseña"
+          );
       } else {
         console.log("Email sent: " + info.response);
-        const newPasswordBcrypt = bcrypt.hashSync(passwordSecure, 10);
-
-        try {
-          await User.findByIdAndUpdate(id, { password: newPasswordBcrypt });
-          const userUpdatePassword = await User.findById(id);
-          if (bcrypt.compareSync(passwordSecure, userUpdatePassword.password)) {
-            return res.status(200).json({
-              updateUser: true,
-              sendPassword: true,
-            });
-          } else {
-            return res.status(404).json({
-              updateUser: false,
-              sendPassword: true,
-            });
-          }
-        } catch (error) {
-          return res.status(404).json(error.message);
-        }
+        return res.status(200).json({
+          message:
+            "Se ha generado una nueva contraseña y se ha enviado por correo electrónico",
+        });
       }
     });
   } catch (error) {
@@ -295,32 +314,39 @@ const sendPassword = async (req, res, next) => {
 //? -----------------------------------------------------------------------------
 //! ------------------CAMBIO DE CONTRASEÑA CUANDO YA SE ESTA ESTA LOGADO---------------
 //? -----------------------------------------------------------------------------
+
 const modifyPassword = async (req, res, next) => {
   try {
     const { password, newPassword } = req.body;
     const { _id } = req.user;
 
-    if (bcrypt.compareSync(password, req.user.password)) {
-      const newPasswordHashed = bcrypt.hashSync(newPassword, 10);
-
-      try {
-        await User.findByIdAndUpdate(_id, { password: newPasswordHashed });
-        const userUpdate = await User.findById(_id);
-        if (bcrypt.compareSync(newPassword, userUpdate.password)) {
-          return res.status(200).json({
-            updateUser: true,
-          });
-        } else {
-          return res.status(200).json({
-            updateUser: false,
-          });
-        }
-      } catch (error) {
-        return res.status(404).json(error.message);
-      }
-    } else {
-      return res.status(404).json("password dont match");
+    if (!password || !newPassword) {
+      return res
+        .status(400)
+        .json(
+          "Por favor, proporciona la contraseña actual y la nueva contraseña"
+        );
     }
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json("Usuario no encontrado");
+    }
+
+    if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(400).json("La contraseña actual no es válida");
+    }
+
+    const newPasswordHashed = bcrypt.hashSync(newPassword, 10);
+
+    await User.findByIdAndUpdate(
+      _id,
+      { password: newPasswordHashed },
+      { new: true }
+    );
+
+    return res.status(200).json("Contraseña modificada exitosamente");
   } catch (error) {
     return next(error);
   }
@@ -329,6 +355,7 @@ const modifyPassword = async (req, res, next) => {
 //! -----------------------------------------------------------------------------
 //? ---------------------------------UPDATE--------------------------------------
 //! -----------------------------------------------------------------------------
+
 const update = async (req, res, next) => {
   let catchImg = req.file?.path;
   try {
@@ -346,18 +373,34 @@ const update = async (req, res, next) => {
     patchUser.email = req.user.email;
 
     try {
-      await User.findByIdAndUpdate(req.user._id, patchUser);
-      if (req.file) {
-        deleteImgCloudinary(req.user.image);
+      // Validar el número de teléfono utilizando la regla definida en el modelo
+      if (!/^\d{9}$/.test(patchUser.telefono)) {
+        return res.status(400).json("Número de teléfono no válido");
       }
-      const updateUser = await User.findById(req.user._id);
-      const updateKeys = Object.keys(req.body);
 
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        patchUser,
+        {
+          new: true, // Return the updated user after the update
+        }
+      );
+
+      if (!updatedUser) {
+        // User not updated
+        if (req.file) {
+          deleteImgCloudinary(req.user.image);
+        }
+        return res.status(404).json("El usuario no se ha actualizado");
+      }
+
+      const updateKeys = Object.keys(req.body);
       const testUpdate = [];
+
       updateKeys.forEach((item) => {
-        if (updateUser[item] == req.body[item]) {
+        if (updatedUser[item] == req.body[item]) {
           testUpdate.push({
-            [item]: true,
+            [item]: req.body[item],
           });
         } else {
           testUpdate.push({
@@ -367,7 +410,7 @@ const update = async (req, res, next) => {
       });
 
       if (req.file) {
-        updateUser.image == req.file.path
+        updatedUser.image == req.file.path
           ? testUpdate.push({
               file: true,
             })
@@ -375,8 +418,10 @@ const update = async (req, res, next) => {
               file: false,
             });
       }
+
       return res.status(200).json({
-        testUpdate,
+        message: "Usuario actualizado correctamente",
+        updateUser: testUpdate,
       });
     } catch (error) {
       return res.status(404).json(error.message);
@@ -390,16 +435,16 @@ const update = async (req, res, next) => {
 //! -----------------------------------------------------------------------------
 //? ----------------------------- DELETE ----------------------------------------
 //! -----------------------------------------------------------------------------
-
 const deleteUser = async (req, res, next) => {
   try {
     const { _id, image } = req.user;
-    await User.findByIdAndDelete(_id);
-    if (await User.findById(_id)) {
-      return res.status(404).json("Dont delete");
-    } else {
+    const deletedUser = await User.findByIdAndDelete(_id);
+
+    if (deletedUser) {
       deleteImgCloudinary(image);
-      return res.status(200).json("ok delete");
+      return res.status(200).json("Usuario eliminado correctamente");
+    } else {
+      return res.status(404).json("No se pudo eliminar el usuario");
     }
   } catch (error) {
     return next(error);
@@ -412,9 +457,8 @@ module.exports = {
   sendCode,
   login,
   changePassword,
-  sendPassword,
   modifyPassword,
   update,
   deleteUser,
-  checkNewUser,
+  checkCode,
 };
