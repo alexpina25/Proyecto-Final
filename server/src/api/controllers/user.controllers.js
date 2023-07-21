@@ -86,7 +86,7 @@ const sendCode = async (req, res, next) => {
     const mailOptions = {
       from: EMAIL_USERNAME,
       to: userDB.email,
-      subject: "Código de confirmación",
+      subject: "Reserval - Código de confirmación",
       html: `
     <h2>Bienvenido(a), ${userDB.name}!</h2>
     <p>Gracias por registrarte en Reserval.</p>
@@ -142,7 +142,7 @@ const login = async (req, res) => {
           .json("El correo electrónico no ha sido validado");
       }
     } else {
-      return res.status(401).json("Usuario no registrado");
+      return res.status(401).json("Negocio no registrado");
     }
   } catch (error) {
     return res.status(500).json("Error al procesar la solicitud");
@@ -171,7 +171,7 @@ const resendCode = async (req, res) => {
     const userExists = await User.findOne({ email: req.body.email });
 
     if (userExists) {
-      const newConfirmationCode = randomCode(); // Generar nuevo código de confirmación
+      const newConfirmationCode = randomCode();
 
       const mailOptions = {
         from: EMAIL_USERNAME,
@@ -259,11 +259,9 @@ const changePassword = async (req, res, next) => {
         .json("El usuario no ha validado el correo electrónico");
     }
 
-    const newPassword = randomPassword();
-    const newPasswordBcrypt = bcrypt.hashSync(newPassword, 10);
-
     // Actualizar la contraseña del usuario en la base de datos
-    userDb.password = newPasswordBcrypt;
+    const newPassword = randomPassword();
+    userDb.password = newPassword;
     await userDb.save();
 
     // Enviar la nueva contraseña por correo
@@ -314,7 +312,6 @@ const changePassword = async (req, res, next) => {
 //? -----------------------------------------------------------------------------
 //! ------------------CAMBIO DE CONTRASEÑA CUANDO YA SE ESTA ESTA LOGADO---------------
 //? -----------------------------------------------------------------------------
-
 const modifyPassword = async (req, res, next) => {
   try {
     const { password, newPassword } = req.body;
