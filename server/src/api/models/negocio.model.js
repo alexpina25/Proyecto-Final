@@ -25,6 +25,28 @@ const NegocioSchema = new mongoose.Schema(
       required: true,
       /* minlength: [8, "Min 8 characters"], */ //! Comentado para simplificar las pruebas
     },
+    categoria: [
+      {
+        type: String,
+        enum: [
+          "Peluqueria",
+          "Salon de uñas",
+          "Maquillajes",
+          "Barberia",
+          "Entrenador personal",
+          "Masajes",
+          "Spa",
+          "Cuidado de piel",
+          "Tatuajes",
+          "Cuidado de pies",
+          "Cejas y pestañas",
+          "Depilación",
+          "Salud mental",
+          "Otros",
+        ],
+        required: true,
+      },
+    ],
     descripcion: { type: String },
     horario: [
       {
