@@ -374,8 +374,18 @@ const updateNegocio = async (req, res) => {
 //! -----------------------------------------------------------------------------
 const deleteNegocio = async (req, res) => {
   try {
-    await Negocio.findByIdAndDelete(req.params.id);
-    res.json({ message: "Negocio eliminado" });
+    const negocio = await Negocio.findById(req.params.id);
+    if (!negocio) {
+      return res.status(404).json({ message: "Negocio no encontrado" });
+    }
+
+    // Asegurarse de que el negocio que realiza la solicitud es el que se va a eliminar
+    if (req.user && req.user.id === req.params.id) {
+      await Negocio.findByIdAndDelete(req.params.id);
+      res.json({ message: "Negocio eliminado" });
+    } else {
+      res.status(403).json({ message: "No autorizado" });
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -401,7 +411,13 @@ const getNegocio = async (req, res) => {
 //! -----------------------------------------------------------------------------
 const getNegociosByCategory = async (req, res) => {
   try {
-    const negocios = await Negocio.find({ categoria: req.params.categoria });
+    const category = req.params.category;
+    const negocios = await Negocio.find({ category: category });
+    if (negocios.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No se encontraron negocios con esa categoría." });
+    }
     res.status(200).json(negocios);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -413,7 +429,7 @@ const getNegociosByCategory = async (req, res) => {
 //! -----------------------------------------------------------------------------
 const getServicesByNegocio = async (req, res) => {
   try {
-    const servicios = await Servicio.find({ negocio: req.params.id });
+    const servicios = await Servicio.find({ category: req.params.category });
     res.status(200).json(servicios);
   } catch (err) {
     res.status(500).json({ message: err.message });

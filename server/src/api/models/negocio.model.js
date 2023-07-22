@@ -4,7 +4,7 @@ const validator = require("validator");
 
 const NegocioSchema = new mongoose.Schema(
   {
-    nombre: { type: String, required: true },
+    nombre: { type: String, required: true, unique: true },
     ubicacion: {
       direccion: { type: String, required: true },
       ciudad: { type: String, required: true },
@@ -25,13 +25,13 @@ const NegocioSchema = new mongoose.Schema(
       required: true,
       /* minlength: [8, "Min 8 characters"], */ //! Comentado para simplificar las pruebas
     },
-    categoria: [
+    category: [
       {
         type: String,
         enum: [
           "Peluqueria",
           "Salon de uñas",
-          "Maquillajes",
+          "Maquillaje",
           "Barberia",
           "Entrenador personal",
           "Masajes",
