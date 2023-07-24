@@ -26,11 +26,9 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: false }));
 
 //! -----ROUTES-----------
-const UserRoutes = require("./src/api/routes/user.routes");
-const NegocioRoutes = require("./src/api/routes/negocio.routes");
-
-app.use("/api/v1/users", UserRoutes);
-app.use("/api/v1/negocios", NegocioRoutes);
+app.use("/api/v1/users", require("./src/api/routes/user.routes"));
+app.use("/api/v1/negocios", require("./src/api/routes/negocio.routes"));
+app.use("/api/v1/servicios", require("./src/api/routes/servicio.routes"));
 
 //! Cuando no se mete ninguna routa
 app.use("*", (req, res, next) => {

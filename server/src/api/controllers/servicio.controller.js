@@ -1,4 +1,4 @@
-const Servicio = require("../models/Servicio");
+const Servicio = require("../models/servicio.model");
 
 //! -----------------------------------------------------------------------------
 //? ----------------------------GET SERVICIOS------------------------------------
@@ -22,6 +22,24 @@ const getServicio = async (req, res) => {
       return res.status(404).json({ message: "No se encontró el servicio." });
     }
     res.json(servicio);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//! -----------------------------------------------------------------------------
+//? ----------------------------GET SERVICIOS BY NAME----------------------------
+//! -----------------------------------------------------------------------------
+const getServiciosByName = async (req, res) => {
+  try {
+    let filter = {};
+
+    if (req.query.nombre) {
+      filter.nombre = new RegExp(req.query.nombre, "i");
+    }
+
+    const servicios = await Servicio.find(filter);
+    res.json(servicios);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -109,4 +127,5 @@ module.exports = {
   updateServicio,
   deleteServicio,
   getServiciosByNegocio,
+  getServiciosByName,
 };
