@@ -2,61 +2,59 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "./index.css";
+import Home from "./pages/Home.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import { Protected } from "./components/Protected.jsx";
 import Login from "./pages/Login.jsx";
-import { Home } from "./pages/Home.jsx";
 import Register from "./pages/Register.jsx";
 import CheckCode from "./pages/CheckCode.jsx";
-import { AuthContextProvider } from "./contexts/authContext.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
-import ProtectedCheck from "./components/ProtectedCheck.jsx";
-import ProtectedCheckChildren from "./components/ProtectedCheckChildren.jsx";
-import Profile from "./pages/Profile.jsx";
-import { ProtectedGeneral } from "./components/ProtectedGeneral.jsx";
+import Perfil from "./pages/Perfil.jsx";
+import DetalleNegocio from "./pages/DetalleNegocio.jsx";
+import Reservas from "./pages/Reservas.jsx";
+import Reserva from "./pages/Reserva.jsx";
+import VerReserva from "./pages/VerReserva.jsx";
+import Settings from "./pages/Settings.jsx";
+import Buscar from "./pages/Buscar.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
+import FAQ from "./pages/FAQ.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import TermsOfService from "./pages/TermsOfService.jsx";
+import Cancellation from "./pages/Cancellation.jsx";
+import Reviews from "./pages/Reviews.jsx";
+import Error404 from "./pages/Error404.jsx";
+import { AuthContextProvider } from "./contexts/authContext.jsx";
+import { Protected } from "./components/Protected.jsx";
+import { ProtectedCheck } from "./components/ProtectedCheck.jsx";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter basename="/">
+    <BrowserRouter>
       <AuthContextProvider>
         <Routes>
-          <Route path="/" element={<App />}>
-            {/* No tienen proteccion de rutas */}
-            <Route index element={<Home />} />
+        <Route path="/" element={<App />}>
+            <Route index path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/profile"
-              element={
-                <Protected>
-                  <Profile />
-                </Protected>
-              }
-            />
-            <Route
-              path="/verifyCode"
-              element={
-                <ProtectedCheckChildren>
-                  <CheckCode />
-                </ProtectedCheckChildren>
-              }
-            />
+            <Route path="register" element={<Register />} />
+            <Route path="/checkcode" element={<CheckCode />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
-
-            {/* Tiene proteccion de rutas */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedGeneral>
-                  <ProtectedCheck>
-                    <Dashboard />
-                  </ProtectedCheck>
-                </ProtectedGeneral>
-              }
-            />
-
-            <Route path="/dashboardN" element={<Dashboard />} />
-          </Route>
+            <Route path="/perfil" element={<Protected><Perfil /></Protected>} />
+            <Route path="/negocios/:id" element={<Protected><DetalleNegocio /></Protected>} />
+            <Route path="/reservas" element={<Protected><Reserva /></Protected>} />
+            <Route path="/reservar" element={<Protected><Reservas /></Protected>} />
+            <Route path="/ver-reserva/:id" element={<Protected><VerReserva /></Protected>} />
+            <Route path="/settings" element={<Protected><Settings /></Protected>} />
+            <Route path="/buscar" element={<Protected><Buscar /></Protected>} />
+            <Route path="/aboutus" element={<AboutUs />} />
+            <Route path="/contactus" element={<ContactUs />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+            <Route path="/termsofservice" element={<TermsOfService />} />
+            <Route path="/cancellation" element={<Cancellation />} />
+            <Route path="/reviews" element={<Protected><Reviews /></Protected>} />
+            <Route path="dashboard" element={<Protected><Dashboard /></Protected>} />
+            <Route path="*" element={<Error404 />} />
+            </Route>
         </Routes>
       </AuthContextProvider>
     </BrowserRouter>

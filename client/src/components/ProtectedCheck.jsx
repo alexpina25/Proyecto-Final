@@ -1,20 +1,19 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/authContext";
+import { useContext } from 'react';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/authContext';
 
-const ProtectedCheck = ({ children }) => {
-  //allUser.data.user.check = true
+export const ProtectedCheck = ({ children }) => {
+  const { user } = useContext(AuthContext);
 
-  // user.check = true
-
-  // cuando sea true lo mandamos a la dashboard y no le dejamos entrar en la pagina
-
-  const { user, allUser } = useAuth();
-
-  if (allUser?.data?.user?.check == true || user?.check == true) {
-    return children;
-  } else {
-    return <Navigate to="/verifyCode" />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
-};
+
+  if (!user.check) {
+    return <Navigate to="/check-email" replace />;
+  }
+
+  return children;
+}
 
 export default ProtectedCheck;

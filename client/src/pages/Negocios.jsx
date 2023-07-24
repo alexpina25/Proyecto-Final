@@ -1,11 +1,11 @@
 import React from 'react'
 
-const ForgotPassword = () => {
+const Negocios = () => {
   return (
     <div>
-
+      
     </div>
   )
 }
 
-export default ForgotPassword
+export default Negocios

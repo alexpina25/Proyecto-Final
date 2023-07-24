@@ -1,15 +1,17 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/authContext";
+import React, { useContext } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../contexts/authContext';
 
 export const Protected = ({ children }) => {
-  // tendremos que traernos el user del contexto
+  const { user } = useContext(AuthContext);
+  const isAuthenticated = Boolean(user);
+  let location = useLocation();
 
-  const { user, logout } = useAuth();
-
-  if (user == null || user?.check == false) {
-    localStorage.removeItem("user");
-    return <Navigate to="/login" />;
+  if (isAuthenticated) {
+    return children;
   }
 
-  return children;
+  return <Navigate to="/login" state={{ from: location }} />;
 };
+
+export default Protected;

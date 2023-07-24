@@ -1,11 +1,11 @@
 import React from 'react'
 
-const ForgotPassword = () => {
+const Error404 = () => {
   return (
     <div>
-
+      
     </div>
   )
 }
 
-export default ForgotPassword
+export default Error404

@@ -1,16 +1,32 @@
 import { Outlet } from "react-router-dom";
-import Header from "./components/Header";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
+
 import "./App.css";
+
+const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+    },
+  },
+});
 
 const App = () => {
   return (
     <>
-      <Header />
-      <main>
+    <ThemeProvider theme={theme}>
+    <NavBar />
+      <div>
         <Outlet />
-      </main>
+      </div>
       <Footer />
+      </ThemeProvider>
     </>
   );
 };

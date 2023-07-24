@@ -1,11 +1,11 @@
 import React from 'react'
 
-const ForgotPassword = () => {
+const PrivacyPolicy = () => {
   return (
     <div>
-
+      
     </div>
   )
 }
 
-export default ForgotPassword
+export default PrivacyPolicy
