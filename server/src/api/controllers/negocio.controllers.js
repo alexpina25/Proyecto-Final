@@ -1,6 +1,5 @@
 const Negocio = require("../models/negocio.model");
 const Reserva = require("../models/reserva.model");
-const Servicio = require("../models/servicio.model");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const randomCode = require("../../utils/randomCode");
 const bcrypt = require("bcrypt");
@@ -425,18 +424,6 @@ const getNegociosByCategory = async (req, res) => {
 };
 
 //! -----------------------------------------------------------------------------
-//? ----------------------------GET SERVICIOS BY NEGOCIO-------------------------
-//! -----------------------------------------------------------------------------
-const getServicesByNegocio = async (req, res) => {
-  try {
-    const servicios = await Servicio.find({ category: req.params.category });
-    res.status(200).json(servicios);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-//! -----------------------------------------------------------------------------
 //? ----------------------------GET RESERVAS BY NEGOCIO-------------------------
 //! -----------------------------------------------------------------------------
 const getReservasByNegocio = async (req, res) => {
@@ -462,6 +449,5 @@ module.exports = {
   checkCode,
   getNegocio,
   getNegociosByCategory,
-  getServicesByNegocio,
   getReservasByNegocio,
 };

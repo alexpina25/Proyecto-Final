@@ -15,7 +15,6 @@ const {
   checkCode,
   getNegocio,
   getNegociosByCategory,
-  getServicesByNegocio,
   getReservasByNegocio,
 } = require("../controllers/negocio.controllers");
 
@@ -35,7 +34,6 @@ router.get("/check/:id", checkCode);
 // Rutas para obtener datos
 router.get("/:id", isAuthNegocio, getNegocio);
 router.get("/category/:category", isAuthNegocio, getNegociosByCategory);
-router.get("/services/:id", isAuthNegocio, getServicesByNegocio);
 router.get("/reservas/:id", isAuthNegocio, getReservasByNegocio);
 
 module.exports = router;
