@@ -38,3 +38,8 @@ export const AuthContextProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+// Custom hook que nos provee del contexto
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

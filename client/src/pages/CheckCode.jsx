@@ -3,7 +3,7 @@ import React from 'react'
 const CheckCode = () => {
   return (
     <div>
-
+      
     </div>
   )
 }
