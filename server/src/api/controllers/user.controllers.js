@@ -226,8 +226,7 @@ const checkCode = async (req, res) => {
       await user.save();
 
       return res.status(200).json({
-        message:
-          "Código de confirmación correcto. El usuario ha sido verificado.",
+        message: "Código de confirmación correcto",
       });
     }
 

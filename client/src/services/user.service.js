@@ -15,8 +15,8 @@ export const registerUser = async (formData) => {
 
 //! -----------------------CHECK CODE -----------------------------------
 
-export const checkCodeConfirmationUser = async (formData) => {
-  return API.post("/users/check", formData)
+export const checkCodeConfirmationUser = async (userId, code) => {
+  return API.post(`/users/check/${userId}`, { confirmationCode: Number(code) })
     .then((res) => res)
     .catch((error) => {
       return error;

@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema(
     },
     check: {
       type: Boolean,
-      default: true, //! TRUE PARA PRUEBAS
+      default: false,
     },
     image: {
       type: String,

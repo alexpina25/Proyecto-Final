@@ -1,6 +1,6 @@
 import Swal from "sweetalert2/dist/sweetalert2.all.js";
 
-const useCheckCodeError = (res, setDeleteUser, setOkCheck, setUser) => {
+const handleCheckCodeResponse = (res, setDeleteUser, setOkCheck, setUser) => {
   // -------404 o un 500  en este caso --------->res.response
   // -------200 ---> entramos directos a la ---->res.data
   //! -------status: 500
@@ -85,4 +85,4 @@ const useCheckCodeError = (res, setDeleteUser, setOkCheck, setUser) => {
     });
 };
 
-export default useCheckCodeError;
+export default handleCheckCodeResponse;

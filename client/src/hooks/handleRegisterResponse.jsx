@@ -1,16 +1,16 @@
-import { Navigate, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2/dist/sweetalert2.all.js";
 
-const useUserError = (res, setRegisterOk) => {
+const handleRegisterResponse = (res, setRegisterOk) => {
   //! 200 --->  respuesta ok register ok
   if (res?.status == 200) {
-    localStorage.setItem("data", JSON.stringify(res));
+    localStorage.setItem("userId", res.data.user._id);
     setRegisterOk(() => true);
     Swal.fire({
       icon: "success",
-      title: "Bienvenido a RESERVAL",
-      showConfirmButton: false,
-      timer: 1500,
+      title: "Registro Exitoso!",
+      text: "Se ha enviado un correo electrónico con el código de verificación.",
+      showConfirmButton: true,
+      timer: 2000,
     });
   }
 
@@ -64,4 +64,4 @@ const useUserError = (res, setRegisterOk) => {
     });
 };
 
-export default useUserError;
+export default handleRegisterResponse;
