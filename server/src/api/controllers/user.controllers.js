@@ -142,7 +142,7 @@ const login = async (req, res) => {
           .json("El correo electrónico no ha sido validado");
       }
     } else {
-      return res.status(401).json("Negocio no registrado");
+      return res.status(401).json("Usuario no registrado");
     }
   } catch (error) {
     return res.status(500).json("Error al procesar la solicitud");

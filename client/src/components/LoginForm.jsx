@@ -1,13 +1,13 @@
 import React, { useState, useContext } from "react";
 import { TextField, Button, Box } from "@mui/material";
-import useUserError from "../hooks/useUserError";
+import handleLoginResponse from "../hooks/handleLoginResponse";
 import { loginUser } from '../services/user.service';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/authContext';
 
 const LoginForm = () => {
   const [loginData, setLoginData] = useState({email: "", password: ""});
-  const setRegisterOk = useState(false)[1];
+  const [registerOk, setRegisterOk] = useState(false);
   const { userlogin } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -19,9 +19,8 @@ const LoginForm = () => {
     event.preventDefault();
     try {
       const response = await loginUser(loginData);
-      useUserError(response, setRegisterOk);
-      if (response.status === 200) {
-        userlogin(response.data);
+      await handleLoginResponse(response, setRegisterOk, userlogin);
+      if (registerOk) {
         navigate('/');
       }
     } catch (error) {

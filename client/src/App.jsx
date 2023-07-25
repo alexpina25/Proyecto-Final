@@ -3,8 +3,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 
-import "./App.css";
-
 const theme = createTheme({
   breakpoints: {
     values: {
