@@ -30,7 +30,7 @@ const register = async (req, res, next) => {
       if (req.file) {
         deleteImgCloudinary(req.file.path);
       }
-      return res.status(409).json("Este usuario ya existe");
+      return res.status(409).json("Este correo electronico ya esta en uso");
     }
 
     const confirmationCode = randomCode();
@@ -137,9 +137,11 @@ const login = async (req, res) => {
           return res.status(401).json("La contraseña es incorrecta");
         }
       } else {
-        return res
-          .status(401)
-          .json("El correo electrónico no ha sido validado");
+        return res.status(401).json({
+          message: "El correo electrónico no ha sido validado",
+          userId: userDB._id,
+          email: userDB.email,
+        });
       }
     } else {
       return res.status(401).json("Usuario no registrado");
@@ -183,7 +185,6 @@ const resendCode = async (req, res) => {
           <p>Por favor, utiliza este código para confirmar tu cuenta.</p>
         `,
       };
-
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.log(error);
@@ -193,9 +194,12 @@ const resendCode = async (req, res) => {
           // Actualizar el código de confirmación en el usuario
           userExists.confirmationCode = newConfirmationCode;
           userExists.save();
-          return res
-            .status(200)
-            .json("El código de verificación ha sido reenviado correctamente");
+          console.log(userExists.email);
+          return res.status(200).json({
+            message:
+              "El código de verificación ha sido reenviado correctamente",
+            userId: userExists._id,
+          });
         }
       });
     } else {

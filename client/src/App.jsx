@@ -20,7 +20,7 @@ const App = () => {
     <>
     <ThemeProvider theme={theme}>
     <NavBar />
-      <div>
+    <div style={{ boxSizing: 'border-box' }}>
         <Outlet />
       </div>
       <Footer />

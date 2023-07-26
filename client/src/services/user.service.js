@@ -54,12 +54,12 @@ export const forgotPasswordUser = async (formData) => {
 //! ----------------------- RESED CODE CONFIRMATION ------------------------------
 
 export const resendCodeConfirmationUser = async (formData) => {
-  return API.post("/users/resend", formData)
+  return API.post("/users/resend", {email: formData })
     .then((res) => res)
     .catch((error) => {
       return error;
     });
-};
+  };
 
 //! ---------------------- CHANGE PASSWORD ---- ESTAMOS LOGADOS---------------------
 export const changePasswordUser = async (formData) => {

@@ -15,14 +15,13 @@ const handleRegisterResponse = (res, setRegisterOk) => {
   }
 
   //! res --> 409 --> Usuario ya registrado
-
-  if (res?.response?.status == 409)
+  if (res?.response?.status === 409)
     Swal.fire({
       icon: "error",
       title: "Oops...",
-      text: "Ya existe este usuario!❌",
+      text: "Este correo ya está registrado ❌",
       showConfirmButton: false,
-      timer: 1500,
+      timer: 3000,
     });
   //! res --> 500 --> Error general del server
 
@@ -35,30 +34,13 @@ const handleRegisterResponse = (res, setRegisterOk) => {
       timer: 1500,
     });
 
-  //! res --> 404 --> codigo en el envio del codigo
-
-  //! error --> nombre de usuario ya exista // error ---> correo ya existe
-
-  if (
-    res?.response?.data?.includes(
-      "duplicate key error collection: userProyect.users index: name_1 dup key: { name"
-    )
-  )
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Elige otro nombre ❌",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-
   //! error ---> validacion de la contraseña
 
-  if (res?.response?.data?.includes("validation failed: password"))
+  if (res?.response?.data?.includes("La contraseña debe tener al mínimo 8 caracteres" || "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número"))
     Swal.fire({
       icon: "error",
-      title: "Oops...",
-      text: "Mínimo 8 carácteres, 1 mayúscula, 1 minúscula y un carácter especial ❌",
+      title: "Contraseña poco segura",
+      text: "Mínimo 8 carácteres, 1 mayúscula, 1 minúscula y un carácter especial.",
       showConfirmButton: false,
       timer: 1500,
     });

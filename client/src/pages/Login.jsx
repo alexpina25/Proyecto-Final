@@ -4,16 +4,9 @@ import { Box, Typography } from "@mui/material";
 
 const LoginPage = () => {
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      height="100vh"
-      padding={2}
-    >
-      <Typography variant="h4" component="h1" gutterBottom>
-        Log In
+    <Box textAlign={'center'} paddingLeft={'15%'} paddingRight={'15%'}>
+      <Typography variant="h4" component="h1" align="center" marginTop="2%">
+        Log in
       </Typography>
       <LoginForm />
     </Box>

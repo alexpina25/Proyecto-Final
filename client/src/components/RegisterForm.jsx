@@ -30,12 +30,12 @@ const RegisterForm = () => {
     event.preventDefault();
     try {
       const response = await registerUser(registerData);
-      const userId = response.data.user._id;
-      
-      if(response && response.data) {
+      if(response && response.status === 200) {
         handleRegisterResponse(response, setRegisterOk);
-        // Navega a la página CheckCode
+        const userId = response.data.user._id;
         navigate(`/checkcode/${userId}`);
+      } else {
+          handleRegisterResponse(response, setRegisterOk);
       }
     } catch (error) {
       console.error(error);
@@ -44,7 +44,7 @@ const RegisterForm = () => {
 
   return (
     <form onSubmit={register}>
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" margin={'auto'}>
         <Avatar alt="User Image" src={previewImage} style={{height: '100px', width: '100px', marginBottom: '15px'}}/>
         <Typography variant="h6" component="h2" gutterBottom>
           Subir imagen de usuario

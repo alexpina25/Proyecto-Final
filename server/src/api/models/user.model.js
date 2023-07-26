@@ -15,7 +15,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, "Nombre del usuario requerido"],
       trim: true,
-      unique: [true, "El nombre de usuario ya existe"],
     },
     password: {
       type: String,

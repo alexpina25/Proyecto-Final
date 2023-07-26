@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Typography, Link, Grid } from "@mui/material";
 
-const Footer = () => {
+export const Footer = () => {
   return (
-    <Box sx={{ backgroundColor: '#333', color: '#fff', p: 3 }}>
+    <Box sx={{ backgroundColor: '#333', color: '#fff', p: 3, mt: 3 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
           <Typography variant="h6">Sobre Nosotros</Typography>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { checkCodeConfirmationUser } from '../services/user.service';
-import Swal from 'sweetalert2';
+import { checkCodeConfirmationUser, resendCodeConfirmationUser } from '../services/user.service';
+import handleCheckCodeResponse from '../hooks/handleCheckCodeResponse';
+import handleResendCodeResponse from '../hooks/handleResendCodeResponse';
 
 const CheckCode = () => {
   const [code, setCode] = useState('');
@@ -18,18 +19,28 @@ const CheckCode = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await checkCodeConfirmationUser(userId, Number(code));
+
+      handleCheckCodeResponse(response, userId);
+
       if (response && response.data) {
-        // Muestra una alerta de SweetAlert2
-        Swal.fire('Código Verificado!', 'Tu cuenta ha sido verificada exitosamente.', 'success');
-        // Navega a la página principal
         navigate('/');
       }
     } catch (error) {
       console.error(error);
-      Swal.fire('Error', 'Ocurrió un error al verificar el código.', 'error');
     }
   };
 
+  const resendCode = async (event) => {
+    event.preventDefault();
+
+    try {
+      const email = localStorage.getItem("email");
+      handleResendCodeResponse(email);
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
   return (
     <Box display="flex"
     flexDirection="column"
@@ -60,6 +71,13 @@ const CheckCode = () => {
           Verificar
         </Button>
       </form>
+      <Button
+        onClick={resendCode}
+        variant="contained"
+        color="secondary"
+        sx={{ mt: 3 }}>
+        Reenviar Código
+      </Button>
     </Box>
   );
 };

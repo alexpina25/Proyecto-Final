@@ -4,6 +4,7 @@ import handleLoginResponse from "../hooks/handleLoginResponse";
 import { loginUser } from '../services/user.service';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/authContext';
+import { forgotPasswordUser } from '../services/user.service';
 
 const LoginForm = () => {
   const [loginData, setLoginData] = useState({email: "", password: ""});
@@ -19,7 +20,9 @@ const LoginForm = () => {
     event.preventDefault();
     try {
       const response = await loginUser(loginData);
-      await handleLoginResponse(response, setRegisterOk, userlogin);
+      localStorage.setItem('userId', response.response.data.userId);
+      localStorage.setItem('email', response.response.data.email);
+      handleLoginResponse(response, setRegisterOk, userlogin, navigate);
       if (registerOk) {
         navigate('/');
       }
@@ -28,9 +31,19 @@ const LoginForm = () => {
     }
   };
 
+
+  const handleForgotPassword = async () => {
+    try {
+      await forgotPasswordUser(email);
+      navigate('/resetpassword'); // Navega a la página de restablecimiento de contraseña.
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
+    <Box>
     <form onSubmit={login}>
-      <Box>
         <TextField
           variant="outlined"
           margin="normal"
@@ -57,11 +70,19 @@ const LoginForm = () => {
           value={loginData.password}
           onChange={handleInputChange}
         />
-        <Button type="submit" fullWidth variant="contained" color="primary">
+        <Button type="submit" variant="contained" color="primary">
           Sign In
         </Button>
-      </Box>
     </form>
+
+        <Button
+        onClick={handleForgotPassword}
+        variant="contained"
+        color="secondary"
+        sx={{ mt: 3 }}>
+        He olvidado mi contraseña
+      </Button>
+    </Box>
   );
 };
 
