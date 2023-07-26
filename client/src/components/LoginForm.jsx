@@ -1,15 +1,14 @@
-import React, { useState, useContext } from "react";
-import { TextField, Button, Box } from "@mui/material";
-import handleLoginResponse from "../hooks/handleLoginResponse";
-import { loginUser } from '../services/user.service';
+import React, { useState } from 'react';
+import { TextField, Button, Box } from '@mui/material';
+import handleLoginResponse from '../hooks/handleLoginResponse';
+import { loginUser, forgotPasswordUser } from '../services/user.service';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/authContext';
-import { forgotPasswordUser } from '../services/user.service';
+import { useAuth } from '../contexts/authContext';
 
 const LoginForm = () => {
-  const [loginData, setLoginData] = useState({email: "", password: ""});
-  const [registerOk, setRegisterOk] = useState(false);
-  const { userlogin } = useContext(AuthContext);
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginOk, setLoginOk] = useState(false);
+  const { userlogin } = useAuth();
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -20,22 +19,30 @@ const LoginForm = () => {
     event.preventDefault();
     try {
       const response = await loginUser(loginData);
-      localStorage.setItem('userId', response.response.data.userId);
-      localStorage.setItem('email', response.response.data.email);
-      handleLoginResponse(response, setRegisterOk, userlogin, navigate);
-      if (registerOk) {
-        navigate('/');
+      if (response) {
+        const { loginSuccessful, userId } = handleLoginResponse(
+          response,
+          setLoginOk,
+          userlogin,
+          navigate
+        );
+        if (loginSuccessful) {
+          navigate('/');
+        } else if (userId) {
+          navigate(`/checkcode/${userId}`);
+        }
+      } else {
+        console.error('Error al iniciar sesión');
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-
   const handleForgotPassword = async () => {
     try {
-      await forgotPasswordUser(email);
-      navigate('/resetpassword'); // Navega a la página de restablecimiento de contraseña.
+      await forgotPasswordUser(loginData.email);
+      navigate('/resetpassword');
     } catch (error) {
       console.error(error);
     }
@@ -43,7 +50,7 @@ const LoginForm = () => {
 
   return (
     <Box>
-    <form onSubmit={login}>
+      <form onSubmit={login}>
         <TextField
           variant="outlined"
           margin="normal"
@@ -73,13 +80,14 @@ const LoginForm = () => {
         <Button type="submit" variant="contained" color="primary">
           Sign In
         </Button>
-    </form>
+      </form>
 
-        <Button
+      <Button
         onClick={handleForgotPassword}
         variant="contained"
         color="secondary"
-        sx={{ mt: 3 }}>
+        sx={{ mt: 3 }}
+      >
         He olvidado mi contraseña
       </Button>
     </Box>

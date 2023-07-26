@@ -10,7 +10,7 @@ const handleResendCodeResponse = async (email) => {
       Swal.fire({
         icon: "success",
         title: "Código reenviado",
-        html: "Por favor, revisa tu correo electrónico para tu nuevo código de confirmación",
+        html: "Por favor, revisa tu correo electrónico para ver tu nuevo código de confirmación",
         showConfirmButton: true,
         timer: 5000,
       });

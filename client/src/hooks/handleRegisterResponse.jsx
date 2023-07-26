@@ -1,7 +1,7 @@
 import Swal from "sweetalert2/dist/sweetalert2.all.js";
 
 const handleRegisterResponse = (res, setRegisterOk) => {
-  //! 200 --->  respuesta ok register ok
+
   if (res?.status == 200) {
     localStorage.setItem("userId", res.data.user._id);
     setRegisterOk(() => true);
@@ -14,7 +14,9 @@ const handleRegisterResponse = (res, setRegisterOk) => {
     });
   }
 
-  //! res --> 409 --> Usuario ya registrado
+/* -------------------------------------------------------------------------- */
+/*                        ERRROR USUARIO YA REGISTRADO                        */
+/* -------------------------------------------------------------------------- */
   if (res?.response?.status === 409)
     Swal.fire({
       icon: "error",
@@ -23,8 +25,10 @@ const handleRegisterResponse = (res, setRegisterOk) => {
       showConfirmButton: false,
       timer: 3000,
     });
-  //! res --> 500 --> Error general del server
 
+/* -------------------------------------------------------------------------- */
+/*                                  ERROR 500                                 */
+/* -------------------------------------------------------------------------- */
   if (res?.response?.status == 500)
     Swal.fire({
       icon: "error",
@@ -34,8 +38,10 @@ const handleRegisterResponse = (res, setRegisterOk) => {
       timer: 1500,
     });
 
-  //! error ---> validacion de la contraseña
 
+/* -------------------------------------------------------------------------- */
+/*                        ERROR CONTRASEÑA POCO SEGURA                        */
+/* -------------------------------------------------------------------------- */
   if (res?.response?.data?.includes("La contraseña debe tener al mínimo 8 caracteres" || "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número"))
     Swal.fire({
       icon: "error",

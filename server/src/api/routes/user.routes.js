@@ -10,6 +10,7 @@ const {
   deleteUser,
   resendCode,
   checkCode,
+  getUser,
 } = require("../controllers/user.controllers");
 
 const express = require("express");
@@ -22,6 +23,7 @@ UserRoutes.post("/check/:id", checkCode);
 UserRoutes.post("/resend", resendCode);
 UserRoutes.get("/forgotpassword", changePassword);
 UserRoutes.post("/login", login);
+UserRoutes.get("/user", getUser);
 
 // Rutas privadas (requieren autenticación)
 UserRoutes.patch("/changepassword", isAuth, modifyPassword);

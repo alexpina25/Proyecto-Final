@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const User = require("../models/user.model");
 const nodemailer = require("nodemailer");
-const { generateToken } = require("../../utils/token");
+const { generateToken, verifyToken } = require("../../utils/token");
 const randomPassword = require("../../utils/randomPassword");
 
 const PORT = process.env.PORT;
@@ -123,28 +123,26 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const userDB = await User.findOne({ email });
-    if (userDB) {
-      if (userDB.check) {
-        const passwordMatch = bcrypt.compareSync(password, userDB.password);
 
-        if (passwordMatch) {
-          const token = generateToken(userDB._id, email);
-          return res.status(200).json({
-            user: userDB,
-            token,
-          });
-        } else {
-          return res.status(401).json("La contraseña es incorrecta");
-        }
+    if (userDB && (await bcrypt.compare(password, userDB.password))) {
+      if (userDB.check) {
+        const token = generateToken(userDB._id, email);
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "Strict",
+        });
+        return res.status(200).json({ user: userDB });
       } else {
         return res.status(401).json({
           message: "El correo electrónico no ha sido validado",
-          userId: userDB._id,
-          email: userDB.email,
+          _id: userDB._id,
         });
       }
     } else {
-      return res.status(401).json("Usuario no registrado");
+      return res
+        .status(401)
+        .json({ message: "Email o contraseña incorrectas" });
     }
   } catch (error) {
     return res.status(500).json("Error al procesar la solicitud");
@@ -334,11 +332,11 @@ const modifyPassword = async (req, res, next) => {
       return res.status(404).json("Usuario no encontrado");
     }
 
-    if (!bcrypt.compareSync(password, user.password)) {
+    if (!(await bcrypt.compare(password, user.password))) {
       return res.status(400).json("La contraseña actual no es válida");
     }
 
-    const newPasswordHashed = bcrypt.hashSync(newPassword, 10);
+    const newPasswordHashed = await bcrypt.hash(newPassword, 10);
 
     await User.findByIdAndUpdate(
       _id,
@@ -451,6 +449,35 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+//! -----------------------------------------------------------------------------
+//? ----------------------------- GET USER ----------------------------------------
+//! -----------------------------------------------------------------------------
+const getUser = async (req, res) => {
+  try {
+    // Obtén el token desde el header Authorization
+    const token = req.headers.authorization.split(" ")[1];
+
+    // Verifica y decodifica el token
+    const decodedToken = verifyToken(token);
+
+    // Busca al usuario en la base de datos con el id decodificado
+    const user = await User.findById(decodedToken.id);
+
+    // Si el usuario no se encuentra, responde con un error
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Si el usuario se encuentra, responde con los datos del usuario
+    return res.status(200).json({ user });
+  } catch (error) {
+    // Si algo sale mal, responde con un error
+    return res
+      .status(500)
+      .json({ message: "Error al procesar la solicitud", error });
+  }
+};
+
 module.exports = {
   register,
   resendCode,
@@ -461,4 +488,5 @@ module.exports = {
   update,
   deleteUser,
   checkCode,
+  getUser,
 };

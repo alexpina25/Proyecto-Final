@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 const cors = require("cors");
 app.use(
   cors({
-    origin: "*",
+    origin: true,
     credentials: true,
   })
 );

@@ -2,6 +2,7 @@ import Swal from "sweetalert2/dist/sweetalert2.all.js";
 
 const handleCheckCodeResponse = (res) => {
 
+
   if (res?.status === 200) {
     Swal.fire({
       icon: "success",
@@ -10,7 +11,9 @@ const handleCheckCodeResponse = (res) => {
       timer: 1500,
     });
   }
-
+/* -------------------------------------------------------------------------- */
+/*                                  ERROR 500                                 */
+/* -------------------------------------------------------------------------- */
   if (res?.response?.status == 500)
     Swal.fire({
       icon: "error",
@@ -19,7 +22,9 @@ const handleCheckCodeResponse = (res) => {
       showConfirmButton: false,
       timer: 1500,
     });
-
+/* -------------------------------------------------------------------------- */
+/*                           ERROR CODIGO INCORRECTO                          */
+/* -------------------------------------------------------------------------- */
   if (res?.response?.data?.includes("Código incorrecto")) {
     Swal.fire({
       icon: "error",

@@ -1,45 +1,57 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from 'react';
+import API from '../services/service.config';
+import Cookies from 'js-cookie';
 
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-
-  const [user, setUser] = useState(() => {
-    const data = localStorage.getItem("user");
-    return data ? JSON.parse(data) : null;
-  });
+  const [user, setUser] = useState(null);
 
   const userlogin = (data) => {
-    const dataString = JSON.stringify(data);
-    localStorage.setItem("user", dataString);
-    setUser(JSON.parse(dataString));
+    setUser(data);
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
+    Cookies.remove('token');
     setUser(null);
   };
-
-  // Se actualiza el estado de user con el valor en localStorage
-  // cada vez que el valor en localStorage cambie.
   useEffect(() => {
-    const data = localStorage.getItem("user");
-    if (data) {
-      setUser(JSON.parse(data));
-    }
+    const getUser = async () => {
+      const token = Cookies.get('token');
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await API.get('/api/v1/user');
+
+        if (response.status === 200) {
+          setUser(response.data);
+        } else {
+          console.error(
+            'Error al obtener la información del usuario desde el servidor',
+          );
+        }
+      } catch (error) {
+        console.error(
+          'Error al obtener la información del usuario desde el servidor',
+          error,
+        );
+      }
+    };
+
+    getUser();
   }, []);
 
   const value = {
     user,
-    setUser,
     userlogin,
-    logout
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook que nos provee del contexto
 export const useAuth = () => {
   return useContext(AuthContext);
 };

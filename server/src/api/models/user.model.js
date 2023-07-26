@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const validator = require("validator");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -8,8 +7,8 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, "Email del usuario requerido"],
       trim: true,
-      unique: [true, "El email ya está registrado"],
-      validate: [validator.isEmail, "Email no válido"],
+      //unique: [true, "El email ya está registrado"],
+      //validate: [validator.isEmail, "Email no válido"],
     },
     name: {
       type: String,
@@ -19,7 +18,6 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Contraseña requerida"],
-      trim: true,
       minlength: [8, "La contraseña debe tener al menos 8 caracteres"],
     },
     rol: {
@@ -33,7 +31,7 @@ const UserSchema = new mongoose.Schema(
     },
     check: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     image: {
       type: String,
@@ -60,12 +58,16 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-UserSchema.pre("save", function (next) {
-  try {
-    this.password = bcrypt.hashSync(this.password, 10);
+UserSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    try {
+      this.password = await bcrypt.hash(this.password, 10);
+      next();
+    } catch (error) {
+      next("Error hashing password", error);
+    }
+  } else {
     next();
-  } catch (error) {
-    next("Error hashing password", error);
   }
 });
 
