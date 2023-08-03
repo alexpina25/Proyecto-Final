@@ -1,6 +1,7 @@
-import React from "react";
-import LoginForm from "../components/LoginForm";
-import { Box, Typography } from "@mui/material";
+import React from 'react';
+import LoginForm from '../components/LoginForm';
+import { Box, Typography } from '@mui/material';
+import ForgotPasswordButton from './../components/ForgotPasswordButton';
 
 const LoginPage = () => {
   return (
@@ -9,6 +10,7 @@ const LoginPage = () => {
         Log in
       </Typography>
       <LoginForm />
+      <ForgotPasswordButton />
     </Box>
   );
 };

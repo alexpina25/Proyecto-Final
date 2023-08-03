@@ -1,104 +1,120 @@
-import { updateToken } from "../util/updateToken";
-import { API } from "./service.config";
-
-//! -----------------------REGISTER -----------------------------------
+import { API } from './service.config';
 
 export const registerUser = async (formData) => {
-  return API.post("/users/register", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  })
-    .then((res) => res)
-    .catch((error) => {
-      return error;
+  try {
+    const response = await API.post('/users/register', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
-
-//! -----------------------CHECK CODE -----------------------------------
 
 export const checkCodeConfirmationUser = async (userId, code) => {
-  return API.post(`/users/check/${userId}`, { confirmationCode: Number(code) })
-    .then((res) => res)
-    .catch((error) => {
-      return error;
+  try {
+    const response = await API.post(`/users/check-code/${userId}`, {
+      confirmationCode: Number(code),
     });
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
-//! -------------------------LOGIN ---------------------------------------
 export const loginUser = async (formData) => {
-  return API.post("/users/login", formData)
-    .then((res) => res)
-    .catch((error) => {
-      return error;
-    });
+  try {
+    const response = await API.post('/users/login', formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
-//! -------------------------AUTOLOGIN ---------------------------------------
-export const autoLoginUser = async (formData) => {
-  return API.post("/users/login/autologin", formData)
-    .then((res) => res)
-    .catch((error) => {
-      return error;
-    });
+export const requestPasswordReset = async (formData) => {
+  try {
+    const response = await API.post('/users/requestPasswordReset', formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
-
-//!  ----------------------forgot password ---------------------------------
-
-export const forgotPasswordUser = async (formData) => {
-  return API.patch("/users/forgotpassword", formData)
-    .then((res) => res)
-    .catch((error) => {
-      return error;
-    });
-};
-
-//! ----------------------- RESED CODE CONFIRMATION ------------------------------
 
 export const resendCodeConfirmationUser = async (formData) => {
-  return API.post("/users/resend", {email: formData })
-    .then((res) => res)
-    .catch((error) => {
-      return error;
-    });
-  };
-
-//! ---------------------- CHANGE PASSWORD ---- ESTAMOS LOGADOS---------------------
-export const changePasswordUser = async (formData) => {
-  return API.patch("/users/changepassword", formData, {
-    headers: {
-      Authorization: `Bearer ${updateToken()}`,
-    },
-  })
-    .then((res) => res)
-    .catch((error) => {
-      return error;
-    });
+  try {
+    const response = await API.post('/users/resend-code', { _id: formData });
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
-//! ------------------------- DELETE USER ---------------------------------------------
+export const resetPasswordUser = async (token, newPassword) => {
+  try {
+    const response = await API.post(`/users/reset-password?token=${token}`, {
+      newPassword,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const deleteUser = async () => {
-  return API.delete("/users/delete", {
-    headers: {
-      Authorization: `Bearer ${updateToken()}`,
-    },
-  })
-    .then((res) => res)
-    .catch((error) => {
-      return error;
-    });
+  try {
+    const response = await API.delete('/users/delete');
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
-//! -------------------------UPDATE USER ----------------------------------------------
-
 export const updateUser = async (formData) => {
-  return API.patch("/users/update/update", formData, {
-    headers: {
-      Authorization: `Bearer ${updateToken()}`,
-      "Content-Type": "multipart/form-data",
-    },
-  })
-    .then((res) => res)
-    .catch((error) => {
-      return error;
+  try {
+    const response = await API.put('/users/update', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUser = async () => {
+  try {
+    const response = await API.get('/users/user');
+    return response;
+  } catch (error) {
+    console.log('Usuario no encontrado');
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    const response = await API.post('/users/logout');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const verifyPassword = async (password) => {
+  try {
+    const response = await API.post('/users/verify-password', { password });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await API.put('/users/change-password', {
+      oldPassword,
+      newPassword,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };

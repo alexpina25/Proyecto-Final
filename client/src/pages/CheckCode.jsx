@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { checkCodeConfirmationUser, resendCodeConfirmationUser } from '../services/user.service';
-import handleCheckCodeResponse from '../hooks/handleCheckCodeResponse';
-import handleResendCodeResponse from '../hooks/handleResendCodeResponse';
+import { Box, Button, TextField } from '@mui/material';
+import { checkCodeConfirmationUser } from '../services/user.service';
+import ResendCodeButton from '../components/resendCodeButton';
+import { useParams } from 'react-router-dom';
+import { handleCheckCodeResponse } from '../helpers/handleCheckCodeResponse';
 
 const CheckCode = () => {
   const [code, setCode] = useState('');
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -17,37 +19,26 @@ const CheckCode = () => {
     event.preventDefault();
 
     try {
-      const userId = localStorage.getItem("userId");
-      const response = await checkCodeConfirmationUser(userId, Number(code));
+      const response = await checkCodeConfirmationUser(id, Number(code));
+      handleCheckCodeResponse(response);
 
-      handleCheckCodeResponse(response, userId);
-
-      if (response && response.data) {
-        navigate('/');
+      if (response?.status === 200) {
+        navigate('/login');
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const resendCode = async (event) => {
-    event.preventDefault();
-
-    try {
-      const email = localStorage.getItem("email");
-      handleResendCodeResponse(email);
-    } catch (error) {
-      console.error(error);
-    }
-
-  };
   return (
-    <Box display="flex"
-    flexDirection="column"
-    alignItems="center"
-    justifyContent="center"
-    height="100vh"
-    padding={2}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      height="100vh"
+      padding={2}
+    >
       <h1>Verificar Código</h1>
       <form onSubmit={verify}>
         <TextField
@@ -62,22 +53,11 @@ const CheckCode = () => {
           onChange={handleInputChange}
           value={code}
         />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-        >
+        <Button type="submit" fullWidth variant="contained" color="primary">
           Verificar
         </Button>
       </form>
-      <Button
-        onClick={resendCode}
-        variant="contained"
-        color="secondary"
-        sx={{ mt: 3 }}>
-        Reenviar Código
-      </Button>
+      <ResendCodeButton userId={id} />
     </Box>
   );
 };

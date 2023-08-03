@@ -1,19 +1,27 @@
-//! creamos el servidor web
-const { configCloudinary } = require("./src/middleware/files.middleware");
-const { connect } = require("./src/utils/db");
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const { connect } = require("./src/utils/db");
+const { configCloudinary } = require("./src/middleware/files.middleware");
+
+// Configuración de dotenv
 dotenv.config();
 
+// Configuración de URL y puerto
 const BASE_URL = process.env.BASE_URL;
-
-//! conectamos con la base de datos
-connect();
-const app = express();
-configCloudinary();
 const PORT = process.env.PORT;
-//! configurar las cors
-const cors = require("cors");
+
+// Conexión a la base de datos
+connect();
+
+// Configuración de la aplicación express
+const app = express();
+
+// Configuración de Cloudinary
+configCloudinary();
+
+// Configuración de CORS
 app.use(
   cors({
     origin: true,
@@ -21,31 +29,36 @@ app.use(
   })
 );
 
-//! limitaciones en la recepcion y envio de datos en 5mb
+// Configuración de límites de recepción y envío de datos
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: false }));
 
-//! -----ROUTES-----------
+// Configuración de Cookie Parser
+app.use(cookieParser());
+
+// Rutas
 app.use("/api/v1/users", require("./src/api/routes/user.routes"));
 app.use("/api/v1/negocios", require("./src/api/routes/negocio.routes"));
 app.use("/api/v1/servicios", require("./src/api/routes/servicio.routes"));
 
-//! Cuando no se mete ninguna routa
+// Manejo de rutas no encontradas
 app.use("*", (req, res, next) => {
   const error = new Error("Route not found");
   error.status = 404;
   return next(error);
 });
 
-//! ERRO 500 DEL SERVER
+// Manejo de errores 500 del servidor
 app.use((error, req, res) => {
   return res
     .status(error.status || 500)
     .json(error.message || "Unexpected error");
 });
 
-//! ----ESCUCHAMOS EN EL PORT LA BASE DE DATOS ------
+// Desactivar el encabezado "X-Powered-By"
 app.disable("x-powered-by");
+
+// Inicio del servidor
 app.listen(PORT, () => {
-  console.log(`Listening on PORT ${BASE_URL}:${PORT}`);
+  console.log(`Listening on ${BASE_URL}:${PORT}`);
 });

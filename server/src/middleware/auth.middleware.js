@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const isAuth = async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
+  const token = req.cookies.token;
 
   if (!token) {
     return next(new Error("Unauthorized"));
@@ -13,7 +13,7 @@ const isAuth = async (req, res, next) => {
 
   try {
     const decoded = verifyToken(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
+    req.user = await User.findOne({ email: decoded.email });
     next();
   } catch (error) {
     return next(error);
@@ -21,7 +21,7 @@ const isAuth = async (req, res, next) => {
 };
 
 const isAuthNegocio = async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
+  const token = req.cookies.token;
 
   if (!token) {
     return next(new Error("Unauthorized"));
@@ -37,14 +37,13 @@ const isAuthNegocio = async (req, res, next) => {
 };
 
 const isAuthAdmin = async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
+  const token = req.cookies.token;
   if (!token) {
     return next(new Error("Unauthorized"));
   }
 
   try {
     const decoded = verifyToken(token, process.env.JWT_SECRET);
-    console.log(decoded);
     req.user = await User.findById(decoded.id);
     if (req.user.rol !== "admin") {
       return next(new Error("Unauthorized, not admin"));

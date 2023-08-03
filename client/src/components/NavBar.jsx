@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
-import { AuthContext } from '../contexts/authContext';
+import React from 'react';
+import { useAuth } from '../context/authContext';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import {
-  Button,
   AppBar,
   Toolbar,
   IconButton,
@@ -14,75 +15,63 @@ import {
   useMediaQuery,
   useTheme,
   Box,
+  Button,
 } from '@mui/material';
-import { AccountCircle, Settings, ExitToApp, Menu } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { AccountCircle, ExitToApp, Menu } from '@mui/icons-material';
+
+const NavItem = ({ to, text, icon, onClick }) => (
+  <ListItem button component={Link} to={to} onClick={onClick}>
+    <ListItemIcon>{icon}</ListItemIcon>
+    <ListItemText primary={text} />
+  </ListItem>
+);
+
+const NavList = ({ isMobile, user, logout }) => {
+  const items = user
+    ? [
+        { to: '/perfil', text: 'Perfil', icon: <AccountCircle /> },
+        { to: '/', text: 'Logout', icon: <ExitToApp />, onClick: logout },
+      ]
+    : [
+        { to: '/login', text: 'Login', icon: <AccountCircle /> },
+        { to: '/register', text: 'Register', icon: <ExitToApp /> },
+      ];
+
+  return (
+    <List
+      style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+    >
+      {items.map((item, index) => (
+        <NavItem key={index} {...item} />
+      ))}
+    </List>
+  );
+};
 
 const NavBar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const toggleDrawer = (open) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return;
+  const handleLogout = async () => {
+    try {
+      logout();
+    } catch (error) {
+      console.error(error);
     }
-    setDrawerOpen(open);
   };
 
-  const list = () => {
-    const textList = user
-      ? ['Perfil', 'Settings', 'Logout']
-      : ['Login', 'Register'];
-    const linkList = user
-      ? ['/perfil', '/settings', '/']
-      : ['/login', '/register'];
-    const iconList = user
-      ? [<AccountCircle />, <Settings />, <ExitToApp />]
-      : [<AccountCircle />, <ExitToApp />];
-    return (
-      <div
-        role="presentation"
-        onClick={toggleDrawer(false)}
-        onKeyDown={toggleDrawer(false)}
-      >
-        <List
-          style={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-          }}
-        >
-          {textList.map((text, index) => (
-            <ListItem
-              button
-              key={text}
-              component={Link}
-              to={linkList[index]}
-              onClick={index === 2 && user ? logout : null}
-            >
-              <ListItemIcon>{iconList[index]}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </div>
-    );
-  };
+  const toggleDrawer = (open) => () => setDrawerOpen(open);
 
   return (
     <AppBar position="static">
       <Toolbar>
-        <Button variant="h6" style={{ flexGrow: 1 }}>
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
           <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
             RESERVAL
           </Link>
-        </Button>
-
+        </Typography>
         {isMobile ? (
           <>
             <IconButton
@@ -98,11 +87,11 @@ const NavBar = () => {
               open={drawerOpen}
               onClose={toggleDrawer(false)}
             >
-              {list()}
+              <NavList isMobile={isMobile} user={user} logout={handleLogout} />
             </Drawer>
           </>
         ) : (
-          <>{list()}</>
+          <NavList isMobile={isMobile} user={user} logout={handleLogout} />
         )}
       </Toolbar>
     </AppBar>

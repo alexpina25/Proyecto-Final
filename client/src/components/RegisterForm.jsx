@@ -1,55 +1,86 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Avatar, Typography } from "@mui/material";
+import React, { useState } from 'react';
+import { TextField, Button, Box, Avatar, Typography } from '@mui/material';
 import { registerUser } from '../services/user.service';
 import { useNavigate } from 'react-router-dom';
-import handleRegisterResponse from './../hooks/handleRegisterResponse';
+import handleRegisterResponse from './../helpers/handleRegisterResponse';
 
-const RegisterForm = () => {
-  const [registerData, setRegisterData] = useState({email: "", name: "", password: "", telefono: "", image: null});
-  const [registerOk, setRegisterOk] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
+export const RegisterForm = () => {
+  const [registerData, setRegisterData] = useState({
+    name: '',
+    telefono: '',
+    email: '',
+    password: '',
+    image: '',
+  });
+
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
 
-  const handleInputChange = (e) => {
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  const handleInputChange = (event) => {
+    setRegisterData({
+      ...registerData,
+      [event.target.name]: event.target.value,
+    });
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    setRegisterData({
+      ...registerData,
+      image: file,
+    });
+
+    // preview de la imagen
     let reader = new FileReader();
-    let file = e.target.files[0];
-
     reader.onloadend = () => {
-      setRegisterData({ ...registerData, image: file });
       setPreviewImage(reader.result);
-    }
-
+    };
     reader.readAsDataURL(file);
-  }
+  };
 
   const register = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
+
+    let formData = new FormData();
+    Object.keys(registerData).forEach((key) => {
+      formData.append(key, registerData[key]);
+    });
+
+    let response;
+
     try {
-      const response = await registerUser(registerData);
-      if(response && response.status === 200) {
-        handleRegisterResponse(response, setRegisterOk);
-        const userId = response.data.user._id;
-        navigate(`/checkcode/${userId}`);
-      } else {
-          handleRegisterResponse(response, setRegisterOk);
+      response = await registerUser(formData);
+      if (response.status === 200) {
+        navigate(`/check-code/${response.data._id}`);
       }
     } catch (error) {
       console.error(error);
+      response = error.response;
+    } finally {
+      handleRegisterResponse(response);
+      setIsLoading(false);
     }
   };
-
   return (
     <form onSubmit={register}>
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" margin={'auto'}>
-        <Avatar alt="User Image" src={previewImage} style={{height: '100px', width: '100px', marginBottom: '15px'}}/>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        margin={'auto'}
+      >
+        <Avatar
+          alt="User Image"
+          src={previewImage}
+          style={{ height: '100px', width: '100px', marginBottom: '15px' }}
+        />
         <Typography variant="h6" component="h2" gutterBottom>
           Subir imagen de usuario
         </Typography>
-        <input type="file" onChange={handleImageChange}/>
+        <input type="file" onChange={handleImageChange} />
         <TextField
           variant="outlined"
           margin="normal"
@@ -72,7 +103,7 @@ const RegisterForm = () => {
           autoComplete="telefono"
           value={registerData.telefono}
           onChange={handleInputChange}
-          />
+        />
         <TextField
           variant="outlined"
           margin="normal"
@@ -99,8 +130,15 @@ const RegisterForm = () => {
           onChange={handleInputChange}
         />
 
-        <Button type="submit" fullWidth variant="contained" color="primary" style={{marginTop: '15px'}}>
-          Sign Up
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          style={{ marginTop: '15px' }}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Registrando usuario...' : 'Registrarme'}
         </Button>
       </Box>
     </form>

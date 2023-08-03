@@ -1,33 +1,41 @@
+const express = require("express");
+const UserRoutes = express.Router();
+
 const { isAuth } = require("../../middleware/auth.middleware");
 const { upload } = require("../../middleware/files.middleware");
 const {
   register,
-  sendCode,
   login,
+  requestPasswordReset,
+  resetPassword,
+  verifyPassword,
   changePassword,
-  modifyPassword,
   update,
   deleteUser,
   resendCode,
   checkCode,
   getUser,
+  logout,
 } = require("../controllers/user.controllers");
 
-const express = require("express");
-const UserRoutes = express.Router();
-
-// Rutas públicas
+// Public Routes
 UserRoutes.post("/register", upload.single("image"), register);
-UserRoutes.get("/register/sendCode/:id", sendCode);
-UserRoutes.post("/check/:id", checkCode);
-UserRoutes.post("/resend", resendCode);
-UserRoutes.get("/forgotpassword", changePassword);
 UserRoutes.post("/login", login);
+UserRoutes.post("/logout", logout);
+
 UserRoutes.get("/user", getUser);
 
-// Rutas privadas (requieren autenticación)
-UserRoutes.patch("/changepassword", isAuth, modifyPassword);
-UserRoutes.patch("/update", isAuth, upload.single("image"), update);
+UserRoutes.post("/resend-code", resendCode);
+UserRoutes.post("/check-code/:id", checkCode);
+
+UserRoutes.post("/requestPasswordReset", requestPasswordReset);
+UserRoutes.post("/reset-password", resetPassword);
+
+// Private Routes (Require Authentication)
+UserRoutes.get("/user", getUser);
+UserRoutes.post("/verify-password", isAuth, verifyPassword);
+UserRoutes.put("/change-password", isAuth, changePassword);
+UserRoutes.put("/update", isAuth, upload.single("image"), update);
 UserRoutes.delete("/delete", isAuth, deleteUser);
 
 module.exports = UserRoutes;

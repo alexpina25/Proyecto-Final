@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -7,8 +8,8 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, "Email del usuario requerido"],
       trim: true,
-      //unique: [true, "El email ya está registrado"],
-      //validate: [validator.isEmail, "Email no válido"],
+      unique: [true, "El email ya está registrado"],
+      validate: [validator.isEmail, "Email no válido"],
     },
     name: {
       type: String,
@@ -29,9 +30,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Código de confirmación requerido"],
     },
+    lastPasswordReset: { type: Date },
     check: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     image: {
       type: String,
@@ -42,7 +44,7 @@ const UserSchema = new mongoose.Schema(
         validator: function (v) {
           return /^\d{9}$/.test(v);
         },
-        message: (props) => `${props.value} no es un número de teléfono válido`,
+        message: `no es un número de teléfono válido`,
       },
       required: [true, "Número de teléfono del usuario requerido"],
     },
