@@ -44,7 +44,7 @@ const UbicacionStep = () => {
       </Flex>
 
       <AspectRatio ratio={16 / 9} height={"300px"} mt={4}>
-        <LoadScript googleMapsApiKey="AIzaSyBBQGQFlIrq57TvUfMDGUq2b0udUFPhwRY">
+        <LoadScript googleMapsApiKey="">
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={center}
