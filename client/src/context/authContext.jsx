@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { getUser, logoutUser } from '../services/user.service';
-import Swal from 'sweetalert2/dist/sweetalert2.all.js';
+import { useToast } from '@chakra-ui/react';
 import Cookies from 'js-cookie';
 
 export const AuthContext = createContext();
@@ -8,6 +8,7 @@ export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   const userlogin = (data) => {
     setUser(data);
@@ -18,11 +19,11 @@ export const AuthContextProvider = ({ children }) => {
       await logoutUser();
       Cookies.remove('token');
       setUser(null);
-      Swal.fire({
-        icon: 'info',
+      toast({
         title: '¡Has cerrado sesión!',
-        showConfirmButton: false,
-        timer: 1500,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
       });
     } catch (error) {
       console.error(error);

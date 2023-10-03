@@ -13,7 +13,7 @@ const createEmailTransporter = () => {
   });
 };
 
-const createEmailOptions = (userDB, newConfirmationCode) => {
+const createEmailOptions = (userDB, newConfirmationCode, encodedToken) => {
   return {
     from: EMAIL_USERNAME,
     to: userDB.email,
@@ -23,7 +23,7 @@ const createEmailOptions = (userDB, newConfirmationCode) => {
       <p>¡Hola! Has solicitado un nuevo código de confirmación para tu cuenta. Asegúrate de copiar el siguiente código:</p>
       <p><strong>${newConfirmationCode}</strong></p>
       <p>Después, haz clic en el siguiente enlace para confirmar tu cuenta:</p>
-      <p><a href="http://localhost:5173/check-code/${userDB._id}" target="_blank">Confirmar mi cuenta</a></p>
+      <p><a href="http://localhost:5173/check-code?token=${encodedToken}" target="_blank">Confirmar mi cuenta</a></p>
       <p>Si no has solicitado este cambio, por favor, ignora este correo electrónico. Tu cuenta seguirá segura.</p>
       <p>¡Esperamos que disfrutes de nuestros servicios!</p>
       <p>Gracias por tu atención.</p>
@@ -31,9 +31,17 @@ const createEmailOptions = (userDB, newConfirmationCode) => {
   };
 };
 
-const sendResendCodeEmail = async (userDB, newConfirmationCode) => {
+const sendResendCodeEmail = async (
+  userDB,
+  newConfirmationCode,
+  encodedToken
+) => {
   const transporter = createEmailTransporter();
-  const mailOptions = createEmailOptions(userDB, newConfirmationCode);
+  const mailOptions = createEmailOptions(
+    userDB,
+    newConfirmationCode,
+    encodedToken
+  );
 
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {

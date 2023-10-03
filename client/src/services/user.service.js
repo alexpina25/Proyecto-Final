@@ -11,14 +11,15 @@ export const registerUser = async (formData) => {
   }
 };
 
-export const checkCodeConfirmationUser = async (userId, code) => {
+export const checkCodeConfirmationUser = async (token, code) => {
   try {
-    const response = await API.post(`/users/check-code/${userId}`, {
-      confirmationCode: Number(code),
+    const response = await API.post(`/users/check-code/${token}`, {
+      code: Number(code),
     });
     return response;
   } catch (error) {
-    throw error;
+    console.log(error);
+    return { error: true, message: error.response.data, response: error.response };
   }
 };
 
@@ -40,9 +41,15 @@ export const requestPasswordReset = async (formData) => {
   }
 };
 
-export const resendCodeConfirmationUser = async (formData) => {
+export const resendCodeConfirmationUser = async (decodedToken, email) => {
   try {
-    const response = await API.post('/users/resend-code', { _id: formData });
+    let body = {};
+    if (decodedToken) {
+      body.token = decodedToken;
+    } else if (email) {
+      body.email = email;
+    }
+    const response = await API.post('/users/resend-code', body);
     return response;
   } catch (error) {
     throw error;
@@ -70,6 +77,7 @@ export const deleteUser = async () => {
 };
 
 export const updateUser = async (formData) => {
+  console.log(formData);
   try {
     const response = await API.put('/users/update', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

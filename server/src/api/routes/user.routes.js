@@ -26,7 +26,7 @@ UserRoutes.post("/logout", logout);
 UserRoutes.get("/user", getUser);
 
 UserRoutes.post("/resend-code", resendCode);
-UserRoutes.post("/check-code/:id", checkCode);
+UserRoutes.post("/check-code/:token", checkCode);
 
 UserRoutes.post("/requestPasswordReset", requestPasswordReset);
 UserRoutes.post("/reset-password", resetPassword);

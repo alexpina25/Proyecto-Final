@@ -17,11 +17,14 @@ const ReservaSchema = new mongoose.Schema(
       ref: "Negocio",
       required: true,
     },
-    fecha: { type: Date, required: true },
     horaInicio: { type: Date, required: true },
     horaFin: { type: Date, required: true },
     comentarios: { type: String },
-    pagada: { type: Boolean, default: false },
+    estado: {
+      type: String,
+      enum: ["pagada", "confirmada", "cancelada", "retrasada", "adelantada"],
+      default: "confirmada",
+    },
   },
   { timestamps: true }
 );

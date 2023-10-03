@@ -45,14 +45,14 @@ const register = async (req, res, next) => {
       const savedUser = await user.save();
       if (savedUser) {
         try {
-          await sendRegistrationEmail(savedUser, confirmationCode);
-
           const token = generateToken(savedUser._id, savedUser.email);
           res.cookie("user", token, {
             httpOnly: true,
             secure: false,
             sameSite: "Strict",
           });
+
+          await sendRegistrationEmail(savedUser, confirmationCode, token);
 
           res.status(200).json({
             _id: savedUser._id,
@@ -117,16 +117,45 @@ const login = async (req, res) => {
 /* -------------------------------------------------------------------------- */
 const resendCode = async (req, res) => {
   try {
-    const { _id } = req.body;
-    const user = await User.findById(_id);
+    const { token, email } = req.body;
+    let userEmail;
+    if (token) {
+      userEmail = jwt.verify(token, process.env.JWT_SECRET).email;
+    } else if (email) {
+      userEmail = email;
+    } else {
+      return res.status(400).json("Se requiere un token o un email.");
+    }
+
+    const user = await User.findOne({ email: userEmail });
+
     if (user.check) {
       return res.status(400).json("El usuario ya está verificado.");
     }
 
     if (user) {
-      const newConfirmationCode = randomCode();
+      const payload = {
+        id: user._id,
+        email: user.email,
+      };
 
-      const info = await sendResendCodeEmail(user, newConfirmationCode);
+      let encodedToken;
+      try {
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+          expiresIn: "24h",
+        });
+        encodedToken = encodeURIComponent(token);
+      } catch (error) {
+        console.error("Error al crear el token:", error);
+        return res.status(500).json("Error al crear el token de verificación.");
+      }
+
+      const newConfirmationCode = randomCode();
+      const info = await sendResendCodeEmail(
+        user,
+        newConfirmationCode,
+        encodedToken
+      );
 
       if (info) {
         user.confirmationCode = newConfirmationCode;
@@ -151,29 +180,29 @@ const resendCode = async (req, res) => {
 /* -------------------------------------------------------------------------- */
 const checkCode = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { confirmationCode } = req.body;
+    const token = req.params.token;
 
-    const user = await User.findById(id);
+    if (!token) {
+      return res.status(401).json("No autenticado");
+    }
 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
     if (!user) {
       return res.status(404).json("Usuario no encontrado");
     }
 
-    if (confirmationCode === user.confirmationCode) {
+    const { code } = req.body;
+    if (user.confirmationCode === code) {
       user.check = true;
       await user.save();
-      res.clearCookie("user");
-      return res.status(200).json({
-        message: "Código de confirmación correcto",
-      });
+      return res.status(200).json("Usuario verificado con éxito");
+    } else {
+      return res.status(400).json("Código incorrecto");
     }
-
-    return res.status(400).json("Código incorrecto");
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error general al verificar el código", error });
+    console.error("Error al verificar el código:", error);
+    return res.status(500).json("Error al procesar la solicitud");
   }
 };
 
@@ -273,7 +302,6 @@ const changePassword = async (req, res) => {
 /*                                 UPDATE USER                                */
 /* -------------------------------------------------------------------------- */
 const update = async (req, res, next) => {
-  console.log(req.body);
   try {
     const updateData = {};
     const user = req.user;
@@ -291,7 +319,7 @@ const update = async (req, res, next) => {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email)) {
         return res
           .status(400)
-          .json({ message: "Correo de teléfono no válido" });
+          .json({ message: "Correo electrónico no válido" });
       }
       updateData.email = req.body.email;
     }

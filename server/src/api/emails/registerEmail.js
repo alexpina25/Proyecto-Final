@@ -13,7 +13,7 @@ const createEmailTransporter = () => {
   });
 };
 
-const createEmailOptions = (userDB, confirmationCode) => {
+const createEmailOptions = (userDB, confirmationCode, token) => {
   return {
     from: EMAIL_USERNAME,
     to: userDB.email,
@@ -24,15 +24,15 @@ const createEmailOptions = (userDB, confirmationCode) => {
       <p>Tu código de confirmación es: <strong>${confirmationCode}</strong></p>
       <p>Por favor, utiliza este código para confirmar tu cuenta.</p>
       <p>Además, puedes hacer clic en el siguiente enlace para confirmar tu cuenta:</p>
-      <p><a href="http://localhost:5173/check-code/${userDB._id}" target="_blank">Confirmar mi cuenta</a></p>
+      <p><a href="http://localhost:5173/check-code?token=${token}" target="_blank">Confirmar mi cuenta</a></p>
       <p>¡Esperamos que disfrutes de nuestros servicios!</p>
     `,
   };
 };
 
-const sendRegistrationEmail = async (userDB, confirmationCode) => {
+const sendRegistrationEmail = async (userDB, confirmationCode, token) => {
   const transporter = createEmailTransporter();
-  const mailOptions = createEmailOptions(userDB, confirmationCode);
+  const mailOptions = createEmailOptions(userDB, confirmationCode, token);
 
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {

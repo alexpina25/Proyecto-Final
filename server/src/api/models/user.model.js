@@ -23,8 +23,8 @@ const UserSchema = new mongoose.Schema(
     },
     rol: {
       type: String,
-      enum: ["admin", "user"],
-      default: "user",
+      enum: ["client", "owner", "both"],
+      default: "client",
     },
     confirmationCode: {
       type: Number,

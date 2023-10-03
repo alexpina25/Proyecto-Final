@@ -1,42 +1,35 @@
-import { handleLoginResponse } from '../helpers/handleLoginResponse';
-import { loginUser } from '../services/user.service';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/authContext';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../services/user.service';
+import { handleLoginResponse } from '../helpers/handleLoginResponse';
 
 export const useLogin = () => {
-  const [status, setStatus] = useState('idle');
+  const [loginStatus, setLoginStatus] = useState('idle');
   const { userlogin } = useAuth();
   const navigate = useNavigate();
 
   const login = async (loginData) => {
-    // Indica que el login está en proceso
-    setStatus('loading');
+    setLoginStatus('loading');
 
     try {
       const response = await loginUser(loginData);
+      const result = handleLoginResponse(response);
 
       if (response.status === 200) {
-        // Guardar el usuario en el contexto
         userlogin(response.data);
-
-        setStatus('succeeded');
-
-        // Handle response and navigate to home page
-        handleLoginResponse(response);
         navigate('/');
-      } else {
-        // If login is unsuccessful, indicate failure status and handle response
-        setStatus('failed');
-        handleLoginResponse(response);
       }
+
+      setLoginStatus(result.status);
+
+      return result;
     } catch (error) {
-      // If there's an error (network issues, server down, etc), indicate failure status and handle response
-      setStatus('failed');
-      handleLoginResponse(error);
+      const errorResult = handleLoginResponse(error);
+      setLoginStatus('failed');
+      return errorResult;
     }
   };
 
-  // Expose login function and status
-  return { login, status };
+  return { login, status: loginStatus };
 };

@@ -1,79 +1,49 @@
-import Swal from 'sweetalert2';
+const handleRegisterResponse = (res, toast) => {
+  const status = res?.response?.status || res.status;
+  const message = res?.response?.data || res.data;
 
-const handleRegisterResponse = (res) => {
-  const isErrorResponse = res.name === "AxiosError";
-  const status = isErrorResponse ? res.response.status : res.status;
-  const message = isErrorResponse ? res.response.data : res.data;
+  const showToast = (status, title, description) => {
+
+    toast({
+      title,
+      description,
+      status,
+      duration: 1500,
+      isClosable: true,
+    });
+  };
+
   switch (status) {
     case 200:
-      Swal.fire({
-        icon: 'success',
-        title: 'Registro Exitoso!',
-        text: 'Se ha enviado un correo electrónico con el código de verificación.',
-        showConfirmButton: true,
-        timer: 2000,
-      });
+      showToast(
+        'success',
+        'Registro Exitoso!',
+        'Se ha enviado un correo electrónico con el código de verificación.',
+      );
       break;
-
     case 400:
-      if (
-        message?.includes(
-          'User validation failed: password: La contraseña debe tener al menos 8 caracteres',
-        )
-      ) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Contraseña poco segura',
-          text: 'Mínimo 8 carácteres',
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-
-      if (
-        message?.includes(
-          'User validation failed: telefono: no es un número de teléfono válido',
-        )
-      ) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Teléfono no válido',
-          text: 'Por favor, introduce un número de teléfono válido.',
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-      if (message?.includes('User validation failed: email: Email no válido')) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Correo no válido',
-          text: 'Por favor, introduce un correo electrónico válido.',
-          showConfirmButton: false,
-          timer: 1500,
-        });
+      if (message?.includes('La contraseña debe tener al menos 8 caracteres')) {
+        showToast('error', 'Contraseña poco segura', 'Mínimo 8 carácteres');
+      } else if (message?.includes('no es un número de teléfono válido')) {
+        showToast(
+          'error',
+          'Teléfono no válido',
+          'Por favor, introduce un número de teléfono válido.',
+        );
+      } else if (message?.includes('Email no válido')) {
+        showToast(
+          'error',
+          'Correo no válido',
+          'Por favor, introduce un correo electrónico válido.',
+        );
       }
       break;
-
     case 409:
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Este correo ya está registrado ❌',
-        showConfirmButton: false,
-        timer: 3000,
-      });
+      showToast('error', 'Oops...', 'Este correo ya está registrado ❌');
       break;
-
     case 500:
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Internal error ❌',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      showToast('error', 'Oops...', 'Internal error ❌');
       break;
-
     default:
       break;
   }

@@ -1,12 +1,12 @@
 import React from 'react';
-import { Typography } from '@mui/material';
+import { Text } from '@chakra-ui/react';
 
 const Error404 = () => {
   return (
     <>
-      <Typography variant="h1" component="div" gutterBottom>
+      <Text variant="h1" component="div" gutterBottom>
         ERROR 404
-      </Typography>
+      </Text>
     </>
   );
 };

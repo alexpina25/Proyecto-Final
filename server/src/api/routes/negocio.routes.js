@@ -1,39 +1,42 @@
 const express = require("express");
 const router = express.Router();
-const { isAuthNegocio } = require("../../middleware/auth.middleware");
+const { isAuth, isAuthOwner } = require("../../middleware/auth.middleware");
 const { upload } = require("../../middleware/files.middleware");
 
 const {
-  register,
-  resendCode,
-  sendCode,
-  login,
-  forgotPassword,
-  modifyPassword,
+  createNegocio,
+  getNegocios,
+  getNegocio,
   updateNegocio,
   deleteNegocio,
-  checkCode,
-  getNegocio,
+  createServicioForNegocio,
+  getServiciosForNegocio,
+  searchNegocios,
   getNegociosByCategory,
   getReservasByNegocio,
 } = require("../controllers/negocio.controllers");
 
 // Rutas para Negocios
-router.post("/register", upload.single("image"), register);
-router.post("/login", login);
-router.post("/forgotPassword", forgotPassword);
-router.patch("/modifyPassword/:id", isAuthNegocio, modifyPassword);
-router.patch("/update/:id", isAuthNegocio, updateNegocio);
-router.delete("/delete/:id", isAuthNegocio, deleteNegocio);
+router.post("/create", isAuth, upload.single("image"), createNegocio);
+router.get("/all", getNegocios);
+router.get("/:id", getNegocio);
+router.get("/category/:category", getNegociosByCategory);
+router.patch("/update/:id", isAuthOwner, updateNegocio);
+router.delete("/delete/:id", isAuthOwner, deleteNegocio);
 
-// Rutas para la confirmación de correo
-router.get("/register/sendCode/:id", sendCode);
-router.post("/resendCode", resendCode);
-router.get("/check/:id", checkCode);
+// Rutas para Servicios de Negocios
+router.post(
+  "/servicios/:id",
+  isAuthOwner,
+  upload.single("image"),
+  createServicioForNegocio
+);
+router.get("/servicios/:id", isAuthOwner, getServiciosForNegocio);
 
-// Rutas para obtener datos
-router.get("/:id", isAuthNegocio, getNegocio);
-router.get("/category/:category", isAuthNegocio, getNegociosByCategory);
-router.get("/reservas/:id", isAuthNegocio, getReservasByNegocio);
+// Rutas para Reservas de Negocios
+router.get("/reservas/:id", isAuthOwner, getReservasByNegocio);
+
+// Ruta para buscar Negocios
+router.get("/search/:query", searchNegocios);
 
 module.exports = router;

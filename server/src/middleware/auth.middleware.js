@@ -20,9 +20,8 @@ const isAuth = async (req, res, next) => {
   }
 };
 
-const isAuthNegocio = async (req, res, next) => {
+const isAuthOwner = async (req, res, next) => {
   const token = req.cookies.token;
-
   if (!token) {
     return next(new Error("Unauthorized"));
   }
@@ -30,21 +29,6 @@ const isAuthNegocio = async (req, res, next) => {
   try {
     const decoded = verifyToken(token, process.env.JWT_SECRET);
     req.user = await Negocio.findById(decoded.id);
-    next();
-  } catch (error) {
-    return next(error);
-  }
-};
-
-const isAuthAdmin = async (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return next(new Error("Unauthorized"));
-  }
-
-  try {
-    const decoded = verifyToken(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
     if (req.user.rol !== "admin") {
       return next(new Error("Unauthorized, not admin"));
     }
@@ -56,6 +40,5 @@ const isAuthAdmin = async (req, res, next) => {
 
 module.exports = {
   isAuth,
-  isAuthNegocio,
-  isAuthAdmin,
+  isAuthOwner,
 };

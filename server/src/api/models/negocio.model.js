@@ -1,9 +1,13 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const validator = require("validator");
 
 const NegocioSchema = new mongoose.Schema(
   {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     nombre: { type: String, required: true, unique: true },
     ubicacion: {
       direccion: { type: String, required: true },
@@ -19,11 +23,6 @@ const NegocioSchema = new mongoose.Schema(
       required: true,
       unique: true,
       validate: [validator.isEmail, "Email not valid"],
-    },
-    password: {
-      type: String,
-      required: true,
-      /* minlength: [8, "Min 8 characters"], */ //! Comentado para simplificar las pruebas
     },
     category: [
       {
@@ -60,19 +59,8 @@ const NegocioSchema = new mongoose.Schema(
     servicios: [{ type: mongoose.Schema.Types.ObjectId, ref: "Servicio" }],
     reservas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reserva" }],
     imagenes: [{ type: String }],
-    confirmationCode: { type: Number, required: true },
-    check: { type: Boolean, default: true }, //! TRUE PARA PRUEBAS
   },
   { timestamps: true }
 );
-
-NegocioSchema.pre("save", function (next) {
-  try {
-    this.password = bcrypt.hashSync(this.password, 10);
-    next();
-  } catch (error) {
-    next("Error hashing password", error);
-  }
-});
 
 module.exports = mongoose.model("Negocio", NegocioSchema);

@@ -1,40 +1,30 @@
-import Swal from 'sweetalert2/dist/sweetalert2.all.js';
-
 export const handleCheckCodeResponse = (res) => {
-  if (!res) return;
 
   const { response } = res;
+  console.log(res);
+  console.log(response);
 
-  if (res?.data?.message?.includes('Código de confirmación correcto')) {
-    Swal.fire({
-      icon: 'success',
+  if (res?.status === 200) {
+    return {
+      status: 'success',
       title: 'Usuario verificado correctamente',
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return;
+      message: '',
+    };
   }
 
   if (response?.status === 500) {
-    Swal.fire({
-      icon: 'error',
+    return {
+      status: 'error',
       title: 'Oops...',
-      text: 'Error general al verificar el código!',
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return;
+      message: 'Error general al verificar el código!',
+    };
   }
 
-  if (response?.data?.includes('Código incorrecto')) {
-    Swal.fire({
-      icon: 'error',
+  if (response?.status === 400) {
+    return {
+      status: 'error',
       title: 'Código incorrecto',
-      text: 'Vuelve a introducir el código o haz click en reenviar código.',
-      showConfirmButton: false,
-      timer: 2500,
-    });
+      message: 'Vuelve a introducir el código o haz click en reenviar código.',
+    };
   }
 };
-
-export default handleCheckCodeResponse;
