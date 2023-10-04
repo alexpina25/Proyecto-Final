@@ -15,7 +15,6 @@ const center = {
 
 const UbicacionStep = () => {
   useEffect(() => {
-    // Tu código de inicialización aquí
   }, []);
 
   return (
