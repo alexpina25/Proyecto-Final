@@ -20,6 +20,7 @@ const CreateNegocioForm = ({ onSubmit }) => {
     handleSubmit,
     formState: { errors },
     getValues,
+    setValue,
   } = useForm({
     defaultValues: {
       nombre: '',
@@ -34,7 +35,7 @@ const CreateNegocioForm = ({ onSubmit }) => {
         lat: 0,
         lng: 0,
       },
-      categoria: [],
+      categorias: [],
       descripcion: '',
       horario: [],
       imagenes: [],
@@ -58,7 +59,7 @@ const CreateNegocioForm = ({ onSubmit }) => {
             <UbicacionStep control={control} errors={errors} />
           </TabPanel>
           <TabPanel>
-            <CategoriesStep control={control} errors={errors} />
+            <CategoriesStep control={control} errors={errors} setValue={setValue} />
           </TabPanel>
           <TabPanel>
             <HorarioStep control={control} errors={errors} />

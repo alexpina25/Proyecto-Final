@@ -17,8 +17,9 @@ const CategoriesStep = ({ control, setValue, errors }) => {
 
   const handleAddCategory = (category) => {
     if (!selectedCategories.includes(category) && category !== '') {
-      setSelectedCategories([...selectedCategories, category]);
-      setValue('categorias', [...selectedCategories, category]);
+      const newCategories = [...selectedCategories, category];
+      setSelectedCategories(newCategories);
+      setValue('categorias', newCategories); // Ahora se usa el estado actualizado
     }
   };
 
@@ -43,15 +44,15 @@ const CategoriesStep = ({ control, setValue, errors }) => {
           <option value="Salon de uñas">Salón de uñas</option>
           <option value="Maquillaje">Maquillaje</option>
           <option value="Barberia">Barbería</option>
-          <option value="EntrenadorPersonal">Entrenador personal</option>
+          <option value="Entrenador personal">Entrenador personal</option>
           <option value="Masajes">Masajes</option>
           <option value="Spa">Spa</option>
-          <option value="CuidadoDePiel">Cuidado de piel</option>
+          <option value="Cuidado de piel">Cuidado de piel</option>
           <option value="Tatuajes">Tatuajes</option>
-          <option value="CuidadoDePies">Cuidado de pies</option>
-          <option value="CejasYPestanas">Cejas y pestañas</option>
-          <option value="Depilacion">Depilación</option>
-          <option value="SaludMental">Salud mental</option>
+          <option value="Cuidado de pies">Cuidado de pies</option>
+          <option value="Cejas y pestañas">Cejas y pestañas</option>
+          <option value="Depilación">Depilación</option>
+          <option value="Salud mental">Salud mental</option>
           <option value="Otros">Otros</option>
         </Select>
         <Wrap mt={2}>
@@ -59,7 +60,7 @@ const CategoriesStep = ({ control, setValue, errors }) => {
             <Badge key={index} m={1}>
               {category}{' '}
               <Button size="xs" onClick={() => handleRemoveCategory(category)}>
-                x
+                X
               </Button>
             </Badge>
           ))}

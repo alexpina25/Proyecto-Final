@@ -23,10 +23,10 @@ const NegocioSchema = new mongoose.Schema(
     email_negocio: {
       type: String,
       required: true,
-      unique: true,
+     // unique: true,
       validate: [validator.isEmail, "Email not valid"],
     },
-    categoria: [
+    categorias: [
       {
         type: String,
         enum: [
