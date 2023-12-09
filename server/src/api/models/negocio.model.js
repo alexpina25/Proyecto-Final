@@ -11,7 +11,8 @@ const NegocioSchema = new mongoose.Schema(
     nombre: { type: String },
     telefono: { type: String },
     ubicacion: {
-      direccion: { type: String },
+      calle: { type: String },
+      local: { type: String },
       ciudad: { type: String },
       provincia: { type: String },
       codigoPostal: { type: String },
@@ -25,7 +26,7 @@ const NegocioSchema = new mongoose.Schema(
       unique: true,
       validate: [validator.isEmail, "Email not valid"],
     },
-    category: [
+    categoria: [
       {
         type: String,
         enum: [

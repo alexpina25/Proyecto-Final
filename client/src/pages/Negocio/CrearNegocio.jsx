@@ -9,8 +9,6 @@ import { useAuth } from '../../context/authContext'; // Asegúrate de que la rut
 const CreateNegocioPage = () => {
   const { user } = useAuth();
 
-console.log(user);
-
   const handleFormSubmit = async (data) => {
     if (user && user._id) {
       // Asegúrate de que user y user._id existen
