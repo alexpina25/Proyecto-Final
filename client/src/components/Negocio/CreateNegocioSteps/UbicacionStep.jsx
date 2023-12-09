@@ -42,7 +42,7 @@ const UbicacionStep = () => {
         <Input placeholder="País" id="country-input" />
       </Flex>
 
-      <AspectRatio ratio={16 / 9} height={"300px"} mt={4}>
+      {/* <AspectRatio ratio={16 / 9} height={"300px"} mt={4}>
         <LoadScript googleMapsApiKey="">
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -52,7 +52,7 @@ const UbicacionStep = () => {
             <Marker position={center} />
           </GoogleMap>
         </LoadScript>
-      </AspectRatio>
+      </AspectRatio> */}
     </>
   );
 };

@@ -75,7 +75,6 @@ const CategoriesStep = ({ control, setValue, errors }) => {
         <Controller
           control={control}
           name="descripcion"
-          rules={{ required: 'La descripción es requerida' }}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <Textarea
               id="descripcion"

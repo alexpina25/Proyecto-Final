@@ -1,7 +1,7 @@
 module.exports = {
   customUserData: (user) => {
     return {
-      userId: user._id,
+      _id: user.id,
       email: user.email,
       name: user.name,
       image: user.image,

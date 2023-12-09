@@ -30,25 +30,23 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
   useEffect(() => {
-    const updateUser = async () => {
+    const verifyUser = async () => {
       try {
-        console.log('Actualizando el usuario...');
-        const response = await getUser();
+        const response = await getUser(); // Asegúrate de que esta solicitud envíe el token
         if (response.status === 200) {
           setUser(response.data);
-          console.log('Usuario actualizado');
         } else {
-          console.error(
-            'Error al obtener la información del usuario desde el servidor',
-          );
+          // Manejar casos donde el usuario no está autenticado
+          setUser(null);
         }
       } catch (error) {
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    updateUser();
+    verifyUser();
   }, []);
 
   const value = {

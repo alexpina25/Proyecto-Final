@@ -17,14 +17,13 @@ const InfoStep = ({ control, errors }) => {
         <Controller
           control={control}
           name="nombre"
-          rules={{ required: 'Nombre es requerido' }}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <Input
               id="nombre"
               placeholder="Ingrese el nombre del negocio"
               onChange={onChange}
               onBlur={onBlur}
-              value={value}
+              value={value ? value : ''}
               ref={ref}
             />
           )}
@@ -40,7 +39,6 @@ const InfoStep = ({ control, errors }) => {
         <Controller
           control={control}
           name="telefono"
-          rules={{ required: 'Teléfono es requerido' }}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <Input
               id="telefono"
@@ -63,12 +61,9 @@ const InfoStep = ({ control, errors }) => {
         <Controller
           control={control}
           name="email_negocio"
-          rules={{
-            required: 'Email es requerido',
-            validate: (value) => value.includes('@') || 'Email inválido',
-          }}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <Input
+              required
               id="email_negocio"
               type="email"
               placeholder="Ingrese el email del negocio"

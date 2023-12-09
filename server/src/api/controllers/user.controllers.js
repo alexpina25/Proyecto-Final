@@ -103,6 +103,7 @@ const login = async (req, res) => {
       secure: false,
       sameSite: "Strict",
     });
+    console.log(userData);
     return res.status(200).json(userData);
   } catch (error) {
     return res.status(500).json({
@@ -162,7 +163,7 @@ const resendCode = async (req, res) => {
         await user.save();
         return res.status(200).json({
           message: "El código de verificación ha sido reenviado correctamente",
-          userId: user._id,
+          _id: user._id,
           codeConfirmation: user.confirmationCode,
         });
       }
@@ -218,7 +219,7 @@ const requestPasswordReset = async (req, res) => {
   }
 
   const secret = user.password + "-" + user.createdAt.getTime();
-  const token = jwt.sign({ userId: user.id }, secret, { expiresIn: 3600 }); // 1 hour
+  const token = jwt.sign({ _id: user._idid }, secret, { expiresIn: 3600 }); // 1 hour
   const encodedToken = encodeURIComponent(token);
 
   const resetPasswordUrl = `http://localhost:5173/reset-password?token=${encodedToken}`;
@@ -237,9 +238,9 @@ const requestPasswordReset = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { newPassword } = req.body;
   const { token } = req.query;
-  const { userId, iat } = jwt.decode(token);
+  const { _id, iat } = jwt.decode(token);
 
-  const user = await User.findOne({ _id: userId });
+  const user = await User.findOne({ _id: _id });
 
   if (!user) {
     return res.status(404).json({ message: "Usuario no válido" });
