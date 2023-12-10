@@ -48,7 +48,7 @@ const CreateNegocioPage = () => {
           borderWidth={1}
           borderRadius="lg"
           bg={'blanco'}
-          w={{ base: '90%', sm: '80%', md: '60%', lg: '90%' }}
+          w={{ base: '80%', sm: '70%', md: '60%', lg: '40%' }}
         >
           <CreateNegocioForm onSubmit={handleFormSubmit} />
         </Box>

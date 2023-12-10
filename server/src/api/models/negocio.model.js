@@ -23,7 +23,7 @@ const NegocioSchema = new mongoose.Schema(
     email_negocio: {
       type: String,
       required: true,
-     // unique: true,
+      // unique: true,
       validate: [validator.isEmail, "Email not valid"],
     },
     categorias: [
@@ -51,8 +51,10 @@ const NegocioSchema = new mongoose.Schema(
     horario: [
       {
         dia: { type: String },
-        abreMañana: { type: String },
-        cierraMañana: { type: String },
+        abierto: { type: Boolean },
+        horarioPartido: { type: Boolean },
+        abreManana: { type: String },
+        cierraManana: { type: String },
         abreTarde: { type: String },
         cierraTarde: { type: String },
       },

@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FormControl,
   FormLabel,
+  Select,
+  Wrap,
+  Badge,
+  Button,
   FormErrorMessage,
   Box,
-  Select,
-  Textarea,
-  Badge,
-  Wrap,
-  Button,
+  Textarea
 } from '@chakra-ui/react';
 import { Controller } from 'react-hook-form';
 
-const CategoriesStep = ({ control, setValue, errors }) => {
-  const [selectedCategories, setSelectedCategories] = useState([]);
+const CategoriesStep = ({ control, errors, setValue, watch }) => {
+  const watchedCategories = watch('categorias', []);
+  const [selectedCategories, setSelectedCategories] =
+    useState(watchedCategories);
+
+  useEffect(() => {
+    setSelectedCategories(watchedCategories);
+  }, [watchedCategories]);
 
   const handleAddCategory = (category) => {
     if (!selectedCategories.includes(category) && category !== '') {
       const newCategories = [...selectedCategories, category];
       setSelectedCategories(newCategories);
-      setValue('categorias', newCategories); // Ahora se usa el estado actualizado
+      setValue('categorias', newCategories);
     }
   };
 

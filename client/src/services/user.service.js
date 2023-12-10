@@ -93,6 +93,7 @@ export const getUser = async () => {
     const response = await API.get('/users/user');
     return response;
   } catch (error) {
+    throw error;
   }
 };
 

@@ -103,7 +103,6 @@ const login = async (req, res) => {
       secure: false,
       sameSite: "Strict",
     });
-    console.log(userData);
     return res.status(200).json(userData);
   } catch (error) {
     return res.status(500).json({
