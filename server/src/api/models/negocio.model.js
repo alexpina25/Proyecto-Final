@@ -61,7 +61,7 @@ const NegocioSchema = new mongoose.Schema(
     ],
     servicios: [{ type: mongoose.Schema.Types.ObjectId, ref: "Servicio" }],
     reservas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reserva" }],
-    imagenes: [{ type: String }],
+    portada: { type: String },
   },
   { timestamps: true }
 );

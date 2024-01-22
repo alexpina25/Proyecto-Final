@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Input,
   Button,
+  Link,
   Box,
   Stack,
   VStack,
@@ -17,11 +18,11 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
-import { useLogin } from '../../hooks/useLogin';
+import { useLogin } from '@/hooks/User/useLogin';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@chakra-ui/react';
-import useForgotPassword from './../../hooks/useForgotPassword';
-import { useResendCode } from '../../hooks/useResendCode';
+import useForgotPassword from './../../hooks/User/useForgotPassword';
+import { useResendCode } from '../../hooks/User/useResendCode';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -95,6 +96,7 @@ const LoginForm = () => {
           <Input
             variant="outline"
             mt={4}
+            mb={2}
             isRequired
             size="md"
             name="password"
@@ -106,8 +108,15 @@ const LoginForm = () => {
             onChange={handleInputChange}
           />
 
-          {/* Aquí uso Stack para alinear los botones en una fila */}
-          <Stack direction={isMobile ? 'column' : 'row'} spacing={4} mt={4}>
+          <Link onClick={onOpen} textDecor={'underline'} fontSize={'sm'}>
+            Olvidé mi contraseña
+          </Link>
+          <Stack
+            direction={isMobile ? 'column' : 'row'}
+            spacing={4}
+            mt={4}
+            justify={'space-around'}
+          >
             <Button
               type="submit"
               variant="solid"
@@ -125,7 +134,6 @@ const LoginForm = () => {
             >
               Regístrate
             </Button>
-            <Button onClick={onOpen}>Olvidé mi contraseña</Button>
 
             {/* Modal para validar correo */}
             <Modal

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { resetPasswordUser } from '../services/user.service';
-import { handleResetPasswordResponse } from '../helpers/handleResetPasswordResponse';
+import { resetPasswordUser } from '../../services/user.service';
+import { handleResetPasswordResponse } from '../../helpers/handleResetPasswordResponse';
 import { useToast } from '@chakra-ui/react';
 
 const useResetPassword = () => {

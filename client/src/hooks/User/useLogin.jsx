@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/authContext';
+import { useAuth } from '../../context/authContext';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/user.service';
-import { handleLoginResponse } from '../helpers/handleLoginResponse';
+import { loginUser } from '../../services/user.service';
+import { handleLoginResponse } from '../../helpers/handleLoginResponse';
 
 export const useLogin = () => {
   const [loginStatus, setLoginStatus] = useState('idle');

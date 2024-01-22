@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import handleRegisterResponse from '../helpers/handleRegisterResponse';
-import { registerUser } from '../services/user.service';
+import handleRegisterResponse from '../../helpers/handleRegisterResponse';
+import { registerUser } from '../../services/user.service';
 import { useToast } from '@chakra-ui/react';
 
 const useRegister = () => {

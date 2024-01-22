@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { resendCodeConfirmationUser } from '../services/user.service';
+import { resendCodeConfirmationUser } from '../../services/user.service';
 import { useToast } from '@chakra-ui/react'; // Asegúrate de tener este paquete o usa otro toast que te guste
 
 export const useResendCode = () => {

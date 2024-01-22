@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Flex, Input, Button, Heading, useToast } from '@chakra-ui/react';
 
-import Navbar from '../../components/Layout/NavBar';
+import Navbar from '@/components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
-import useResetPassword from '../../hooks/useResetPassword';
+import useResetPassword from '../../hooks/User/useResetPassword';
 
 const ResetPasswordPage = () => {
   const {

@@ -61,7 +61,7 @@ const NavBar = () => {
     >
       <Box color={'verde'} cursor={'pointer'}>
         <Heading size={'2xl'} onClick={() => navigate('/')}>
-          BOOKBIZ
+          BOOKYALL
         </Heading>
       </Box>
 

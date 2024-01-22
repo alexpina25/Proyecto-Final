@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { requestPasswordReset } from '../services/user.service';
+import { requestPasswordReset } from '../../services/user.service';
 import { useToast } from '@chakra-ui/react';
 
 const useForgotPassword = (onOpen, onClose) => {

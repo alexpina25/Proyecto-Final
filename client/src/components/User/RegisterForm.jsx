@@ -13,7 +13,7 @@ import {
   Image,
 } from '@chakra-ui/react';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
-import useRegister from '../../hooks/useRegister';
+import useRegister from '../../hooks/User/useRegister';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 export const RegisterForm = () => {
@@ -27,7 +27,7 @@ export const RegisterForm = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const handlePasswordVisibility = () => setShowPassword(!showPassword);
-  
+
   return (
     <Stack w={'full'} spacing={4}>
       <Heading fontSize={'2xl'} textAlign={'center'}>

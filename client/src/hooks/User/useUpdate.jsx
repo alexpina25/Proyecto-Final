@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
-import { updateUser } from '../services/user.service';
-import { useAuth } from '../context/authContext';
+import { updateUser } from '../../services/user.service';
+import { useAuth } from '../../context/authContext';
 
 const useUpdate = () => {
   const toast = useToast();

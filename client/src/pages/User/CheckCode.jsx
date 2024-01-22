@@ -12,7 +12,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { checkCodeConfirmationUser } from '../../services/user.service';
 import { handleCheckCodeResponse } from '../../helpers/handleCheckCodeResponse';
-import { useResendCode } from '../../hooks/useResendCode';
+import { useResendCode } from '../../hooks/User/useResendCode';
 import { useToast } from '@chakra-ui/react';
 import NavBar from './../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';

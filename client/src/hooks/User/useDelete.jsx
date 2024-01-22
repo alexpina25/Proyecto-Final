@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
-import { deleteUser } from '../services/user.service';
-import { useAuth } from '../context/authContext';
+import { deleteUser } from '../../services/user.service';
+import { useAuth } from '../../context/authContext';
 
 const useDeleteUser = () => {
   const { logout } = useAuth();

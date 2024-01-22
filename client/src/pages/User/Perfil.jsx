@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Flex, Stack, Avatar, Heading, Button } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
-import useUpdate from '../../hooks/useUpdate';
+import useUpdate from '../../hooks/User/useUpdate';
 import EditableField from '../../components/common/EditableField';
 import NavBar from './../../components/layout/Navbar';
 import Footer from './../../components/layout/Footer';

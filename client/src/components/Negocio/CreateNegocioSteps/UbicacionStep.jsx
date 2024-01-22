@@ -9,7 +9,6 @@ import {
 } from '@chakra-ui/react';
 import { Controller } from 'react-hook-form';
 
-
 const UbicacionStep = ({ control, errors }) => {
   return (
     <>
@@ -58,17 +57,15 @@ const UbicacionStep = ({ control, errors }) => {
         </FormControl>
       </Flex>
 
-      {/* <AspectRatio ratio={16 / 9} height={"300px"} mt={4}>
+      <AspectRatio ratio={16 / 9} height={'300px'} mt={4}>
         <LoadScript googleMapsApiKey="">
           <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
             zoom={11}
           >
-            <Marker position={center} />
+            <Marker />
           </GoogleMap>
         </LoadScript>
-      </AspectRatio> */}
+      </AspectRatio>
     </>
   );
 };
