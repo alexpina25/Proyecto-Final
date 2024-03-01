@@ -1,33 +1,30 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/authContext';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/user.service';
-import { handleLoginResponse } from '../../helpers/handleLoginResponse';
+import Cookies from 'js-cookie';
 
 export const useLogin = () => {
   const [loginStatus, setLoginStatus] = useState('idle');
-  const { userlogin } = useAuth();
+  const { userLogin } = useAuth();
   const navigate = useNavigate();
 
   const login = async (loginData) => {
     setLoginStatus('loading');
-
     try {
       const response = await loginUser(loginData);
-      const result = handleLoginResponse(response);
-
       if (response.status === 200) {
-        userlogin(response.data);
-        navigate('/');
+        const { token } = response.data; // Extract the token from the response
+        Cookies.set('token', token); // Correctly store the token in Cookies
+        userLogin(response.data); // Assume userLogin updates the context/state with user data
+        navigate('/'); // Navigate to the homepage or dashboard
+        setLoginStatus('success');
+      } else {
+        setLoginStatus('failed');
       }
-
-      setLoginStatus(result.status);
-
-      return result;
     } catch (error) {
-      const errorResult = handleLoginResponse(error);
+      console.error(error);
       setLoginStatus('failed');
-      return errorResult;
     }
   };
 

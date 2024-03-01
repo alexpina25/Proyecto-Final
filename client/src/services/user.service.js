@@ -18,7 +18,7 @@ export const checkCodeConfirmationUser = async (token, code) => {
     });
     return response;
   } catch (error) {
-    console.log(error);
+    console.error('Error al verificar el código:', error);
     return { error: true, message: error.response.data, response: error.response };
   }
 };
@@ -77,7 +77,6 @@ export const deleteUser = async () => {
 };
 
 export const updateUser = async (formData) => {
-  console.log(formData);
   try {
     const response = await API.put('/users/update', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

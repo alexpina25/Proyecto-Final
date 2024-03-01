@@ -1,75 +1,117 @@
-import Swal from 'sweetalert2';
-import { verifyPassword, changePassword } from '../../services/user.service';
+import React, { useState } from 'react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/react';
+import { changePassword, verifyPassword } from '../../services/user.service';
 
-const useChangePassword = () => {
+const ChangePasswordModal = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   const handleChangePassword = async () => {
-    const steps = ['1', '2', '3'];
-    const Queue = Swal.mixin({
-      progressSteps: steps,
-      confirmButtonText: 'Siguiente >',
-      showCloseButton: true,
-      showClass: { backdrop: 'swal2-noanimation' },
-      hideClass: { backdrop: 'swal2-noanimation' },
-    });
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: 'Error',
+        description: 'Passwords do not match.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+      return;
+    }
 
-    const { value: oldPassword } = await Queue.fire({
-      title: 'Contraseña actual',
-      text: 'Por favor, introduce tu contraseña actual',
-      input: 'password',
-      currentProgressStep: 0,
-      showClass: { backdrop: 'swal2-noanimation' },
-    });
-
-    if (oldPassword && oldPassword !== '') {
-      try {
-        const response = await verifyPassword(oldPassword);
-        if (response.status === 200) {
-          const { value: newPassword } = await Queue.fire({
-            title: 'Nueva contraseña',
-            text: 'Por favor, introduce tu nueva contraseña',
-            input: 'password',
-            inputValidator: (value) => {
-              if (!value) {
-                return 'Necesitas escribir una contraseña';
-              }
-            },
-            currentProgressStep: 1,
-          });
-
-          if (newPassword) {
-            const { value: confirmPassword } = await Queue.fire({
-              title: 'Confirmar nueva contraseña',
-              text: 'Por favor, confirma tu nueva contraseña',
-              input: 'password',
-              inputValidator: (value) => {
-                if (!value) {
-                  return 'Necesitas confirmar la nueva contraseña';
-                }
-              },
-              currentProgressStep: 2,
-            });
-
-            if (confirmPassword && newPassword === confirmPassword) {
-              await changePassword(oldPassword, newPassword);
-              Swal.fire(
-                'Éxito',
-                'Contraseña cambiada correctamente',
-                'success',
-              );
-            } else {
-              Swal.fire('Error', 'Las contraseñas no coinciden', 'error');
-            }
-          }
-        } else {
-          Swal.fire('Error', 'Contraseña incorrecta', 'error');
-        }
-      } catch (error) {
-        Swal.fire('Error', 'Error al verificar la contraseña', 'error');
+    try {
+      const response = await verifyPassword(oldPassword);
+      if (response.status === 200) {
+        await changePassword(oldPassword, newPassword);
+        toast({
+          title: 'Success',
+          description: 'Password changed successfully.',
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose(); // Close the modal on success
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Incorrect password.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        });
       }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'There was an error changing the password.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
     }
   };
 
-  return handleChangePassword;
+  return (
+    <>
+      <Button onClick={onOpen}>Change Password</Button>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Change Password</ModalHeader>
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel>Old Password</FormLabel>
+              <Input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>New Password</FormLabel>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Confirm New Password</FormLabel>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose} mr={3}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue" onClick={handleChangePassword}>
+              Submit
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
 };
 
-export default useChangePassword;
+export default ChangePasswordModal;

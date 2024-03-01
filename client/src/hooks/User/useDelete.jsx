@@ -1,45 +1,56 @@
-import Swal from 'sweetalert2';
-import { deleteUser } from '../../services/user.service';
+import React, { useState } from 'react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Button,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useAuth } from '../../context/authContext';
+import { deleteUser } from '../../services/user.service';
 
-const useDeleteUser = () => {
+const DeleteUserModal = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { logout } = useAuth();
 
   const handleDeleteUser = async () => {
     try {
       await deleteUser();
       logout();
-      Swal.fire({
-        icon: 'success',
-        title: 'Usuario borrado',
-        text: 'Tu cuenta ha sido borrada exitosamente.',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      // Handle successful deletion here, maybe close the modal and show a toast
+      onClose(); // Close the modal on successful deletion
     } catch (error) {
       console.error(error);
-      // Puedes manejar los errores aquí, quizás mostrar otro Sweet Alert.
+      // Handle deletion error here, maybe show an error toast
     }
   };
 
-  const confirmDeleteUser = () => {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Este proceso no puede ser revertido',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, borrar',
-      cancelButtonText: 'No, cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        handleDeleteUser();
-      }
-    });
-  };
+  return (
+    <>
+      <Button colorScheme="red" onClick={onOpen}>
+        Delete Account
+      </Button>
 
-  return confirmDeleteUser;
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Account</ModalHeader>
+          <ModalBody>Are you sure? This action cannot be undone.</ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="red" onClick={handleDeleteUser}>
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
 };
 
-export default useDeleteUser;
+export default DeleteUserModal;

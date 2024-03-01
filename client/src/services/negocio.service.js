@@ -1,7 +1,6 @@
 import { API } from './service.config';
 
 export const createNegocio = async (formData) => {
-  console.log(formData);
   try {
     const response = await API.post('/negocios/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

@@ -13,22 +13,14 @@
     "@chakra-ui/icons": "^2.1.0",
     "@chakra-ui/react": "^2.8.0",
     "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
     "@react-google-maps/api": "^2.18.1",
     "axios": "^1.4.0",
-    "framer-motion": "^10.16.1",
     "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.4",
     "react-icons": "^4.10.1",
-    "react-router-dom": "^6.15.0",
-    "react-select": "^5.7.4",
-    "react-slick": "^0.29.0",
-    "react-use": "^17.4.0",
-    "styled-components": "^6.0.7",
-    "sweetalert2": "^11.7.27",
-    "swiper": "^11.0.5"
+    "react-router-dom": "^6.15.0"
   },
   "devDependencies": {
     "@types/react-dom": "^18.2.7",

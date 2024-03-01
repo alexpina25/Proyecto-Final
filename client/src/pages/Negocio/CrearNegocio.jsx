@@ -19,7 +19,6 @@ const CreateNegocioPage = () => {
 
       try {
         const response = await createNegocio(formDataConOwner);
-        console.log('Respuesta del servidor:', response);
         // Manejar la respuesta del servidor aquí
         if (response.status === 201) {
           // Manejar el caso de éxito aquí

@@ -22,9 +22,9 @@ const NegocioSchema = new mongoose.Schema(
 
     email_negocio: {
       type: String,
-      required: true,
+      //required: true,
       // unique: true,
-      validate: [validator.isEmail, "Email not valid"],
+      //validate: [validator.isEmail, "Email not valid"],
     },
     categorias: [
       {

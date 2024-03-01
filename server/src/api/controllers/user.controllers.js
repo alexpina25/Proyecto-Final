@@ -221,7 +221,7 @@ const requestPasswordReset = async (req, res) => {
   const token = jwt.sign({ _id: user._idid }, secret, { expiresIn: 3600 }); // 1 hour
   const encodedToken = encodeURIComponent(token);
 
-  const resetPasswordUrl = `http://localhost:5173/reset-password?token=${encodedToken}`;
+  const resetPasswordUrl = `http://localhost:3001/reset-password?token=${encodedToken}`;
 
   await resetPasswordEmail(user, resetPasswordUrl);
 

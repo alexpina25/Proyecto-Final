@@ -1,8 +1,6 @@
 export const handleCheckCodeResponse = (res) => {
 
   const { response } = res;
-  console.log(res);
-  console.log(response);
 
   if (res?.status === 200) {
     return {

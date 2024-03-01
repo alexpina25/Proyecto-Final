@@ -10,8 +10,9 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const toast = useToast();
 
-  const userlogin = (data) => {
+  const userLogin = (data) => {
     setUser(data);
+    Cookies.set('token', data.token); // Ensure the token is being set in cookies here
   };
 
   const logout = async () => {
@@ -20,8 +21,8 @@ export const AuthContextProvider = ({ children }) => {
       Cookies.remove('token');
       setUser(null);
       toast({
-        title: '¡Has cerrado sesión!',
-        status: 'error',
+        title: 'Session closed successfully!',
+        status: 'success',
         duration: 5000,
         isClosable: true,
       });
@@ -29,14 +30,19 @@ export const AuthContextProvider = ({ children }) => {
       console.error(error);
     }
   };
+
   useEffect(() => {
     const verifyUser = async () => {
       try {
-        const response = await getUser(); // Asegúrate de que esta solicitud envíe el token
-        if (response.status === 200) {
-          setUser(response.data);
+        const token = Cookies.get('token');
+        if (token) {
+          const response = await getUser(token); // Ensure this request sends the token
+          if (response.status === 200) {
+            setUser(response.data);
+          } else {
+            setUser(null);
+          }
         } else {
-          // Manejar casos donde el usuario no está autenticado
           setUser(null);
         }
       } catch (error) {
@@ -52,7 +58,7 @@ export const AuthContextProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    userlogin,
+    userLogin,
     logout,
   };
 

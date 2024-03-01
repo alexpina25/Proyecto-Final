@@ -8,7 +8,6 @@ const useForgotPassword = (onOpen, onClose) => {
   const toast = useToast();
 
   const handleForgotPassword = async () => {
-    onOpen();
     if (!email) {
       toast({
         title: 'Error',

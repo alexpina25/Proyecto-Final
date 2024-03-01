@@ -4,7 +4,6 @@ const Reserva = require("../models/reserva.model");
 
 // Crear un nuevo negocio
 const createNegocio = async (req, res, next) => {
-  console.log(req.body);
   try {
     const negocio = new Negocio(req.body);
     await negocio.save();
